@@ -14,10 +14,19 @@ import java.awt.event.KeyListener;
 
 
 public class GUI extends JFrame implements KeyListener {
-    JLabel label[][];
+
+
+
+    JLabel label[][]; // Grid with GUI of values and color.
+ // Grid with values in in int.
+
+
+
+
         public GUI(int x, int y) {
 
             label = new JLabel[x][y];
+
             JPanel grid = new JPanel(new GridLayout(x, y, 2, 2));
             grid.addKeyListener(this);
 
@@ -61,6 +70,8 @@ public class GUI extends JFrame implements KeyListener {
 
     }
 
+
+
     public void setTileSize(int numx,int numy,int Dimx,int Dimy){
 
         label[numx-1][numy-1].setPreferredSize(new Dimension(Dimx,Dimy));
@@ -85,7 +96,8 @@ public class GUI extends JFrame implements KeyListener {
     }
 
     public void setTileText(int x,int y, String text){
-        setTileColor(x,y,Integer.parseInt(text));
+        setTileColor(x,y,Integer.parseInt(text));  // setting int and color
+
         label[x][y].setText(text);
         label[x][y].setHorizontalAlignment(SwingConstants.CENTER);
         label[x][y].setVerticalAlignment(SwingConstants.CENTER);

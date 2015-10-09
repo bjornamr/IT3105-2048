@@ -10,8 +10,8 @@ https://github.com/bulenkov/2048/blob/master/src/com/bulenkov/game2048/Game2048.
 
 import GUI.GUI;
 import java.awt.*;
+import java.util.Random;
 import javax.swing.*;
-import javax.swing.border.*;
 
 
 public class Game{
@@ -30,6 +30,8 @@ public class Game{
 
     private final int GOAL = 2048;
 
+
+    Random random = new Random();
 
 
     private int[][] GridValues; // Values
@@ -57,20 +59,30 @@ public class Game{
     }
 
 
-    private int[][] getEmptyCells(){
-       // int [][] empty = new int[GridValues.length][GridValues[0].length];  // assuming that every line is equal in a row or coloumn.
 
-        for( int i = 0; i<GridValues.length; i++){
-            for (int j = 0; j<GridValues[i].length; j++){
-                if(GridValues[i][j] ==0){
-
-                }
-            }
-        }
-
-        return null;
+    public void setTile(int x, int y, int number) {
+        frame.setTileText(x,y,Integer.toString(number));  // color based on number.
+        GridValues[x][y] =number; // setting number to grid
     }
 
+    public int genTwosfours(){
+        return Math.random() < 0.9 ? 2 : 4; // generating 2s 90 perecent of the time.
+    }
+
+    public boolean isEmpty(int x,int y){
+        if(GridValues[x][y] ==0) return true;
+        return false;
+    }
+
+
+    public boolean wonGame(){
+        for(int i=0; i<GridValues.length; i++){
+            for(int j=0; j<GridValues[i].length; j++){
+                if(GridValues[i][j]==2048) return true;
+            }
+        }
+        return false;
+    }
 
 
 
@@ -109,10 +121,6 @@ public class Game{
 
 
     }
-
-
-
-
 
 }
 
