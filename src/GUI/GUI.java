@@ -42,6 +42,25 @@ public class GUI extends JFrame implements KeyListener {
         }
 
 
+    public Color getBackGroundColor(int value){
+        switch (value){
+            case 2:    return new Color(0xeee4da);
+            case 4:    return new Color(0xede0c8);
+            case 8:    return new Color(0xf2b179);
+            case 16:   return new Color(0xf59563);
+            case 32:   return new Color(0xf67c5f);
+            case 64:   return new Color(0xf65e3b);
+            case 128:  return new Color(0xedcf72);
+            case 256:  return new Color(0xedcc61);
+            case 512:  return new Color(0xedc850);
+            case 1024: return new Color(0xedc53f);
+            case 2048: return new Color(0xedc22e);
+            default: return new Color(0,0,0);
+
+        }
+
+    }
+
     public void setTileSize(int numx,int numy,int Dimx,int Dimy){
 
         label[numx-1][numy-1].setPreferredSize(new Dimension(Dimx,Dimy));
@@ -66,6 +85,7 @@ public class GUI extends JFrame implements KeyListener {
     }
 
     public void setTileText(int x,int y, String text){
+        setTileColor(x,y,Integer.parseInt(text));
         label[x][y].setText(text);
         label[x][y].setHorizontalAlignment(SwingConstants.CENTER);
         label[x][y].setVerticalAlignment(SwingConstants.CENTER);
@@ -73,9 +93,8 @@ public class GUI extends JFrame implements KeyListener {
 
     }
 
-    public void setTileColor(int x,int y,int r,int g,int b){
-        label[x][y].setBackground(new Color(r,g,b));
-
+    public void setTileColor(int x,int y,int number){
+        label[x][y].setBackground(getBackGroundColor(number));
     }
 
     @Override
