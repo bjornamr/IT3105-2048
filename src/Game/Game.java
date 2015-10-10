@@ -100,10 +100,11 @@ public class Game implements MyListener{
 
     public void chooseEmptySpot(){ // chooses random spot from all the empty tiles.
        ArrayList arr= getEmptyTiles();
-        int randomIndex = random.nextInt(arr.size()); // index from emptyTiles
-        int[] emptyindex =i1Dto2D((int)arr.get(randomIndex));  // index is now X and Y
-        setTile(emptyindex[0],emptyindex[1],genTwosfours()); // setting tiles
-
+        if( arr.size() !=0) {
+            int randomIndex = random.nextInt(arr.size()); // index from emptyTiles
+            int[] emptyindex = i1Dto2D((int) arr.get(randomIndex));  // index is now X and Y
+            setTile(emptyindex[0], emptyindex[1], genTwosfours()); // setting tiles
+        }
 
     }
 
