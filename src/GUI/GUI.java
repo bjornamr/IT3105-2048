@@ -1,17 +1,13 @@
 package GUI;
 
-import Game.Observer;
+import Game.MyListener;
 
 import javax.swing.*;
-
-import java.util.ArrayList;
-
-
-import javax.swing.JFrame; //imports JFrame library
 import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 
 public class GUI extends JFrame implements KeyListener {
@@ -19,13 +15,13 @@ public class GUI extends JFrame implements KeyListener {
 
 
     JLabel label[][]; // Grid with GUI of values and color.
- // Grid with values in in int.
+    private ArrayList<MyListener> listeners = new ArrayList<>();
 
 
 
-    private ArrayList<Observer> obsList;
-        public GUI(int x, int y) {
-            obsList = new ArrayList(); // initiatiting observerlist
+
+    public GUI(int x, int y) {
+
 
             label = new JLabel[x][y];
 
@@ -113,26 +109,13 @@ public class GUI extends JFrame implements KeyListener {
     public void setTileColor(int x,int y,int number){
         label[x][y].setBackground(getBackGroundColor(number));
     }
-    public void NotifyObservers(KeyEvent keyEvent)
-    {
-        for(Observer obs : obsList)
-        {
-            obs.update(keyEvent);
-        }
-    }
 
-    public void AddObserver(Observer obs)
-    {
-        if (obs != null)
-            obsList.add(obs);
+    public void addListener(MyListener listener) {
+        listeners.add(listener);
     }
+    void notifySomethingHappened(){
 
-    public void DelObserver(Observer obs)
-    {
-        if (obs != null)
-            obsList.remove(obs);
     }
-
 
 
     @Override
@@ -142,8 +125,9 @@ public class GUI extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        //NotifyObservers(e);
-        System.out.println("2 "+ e.getKeyCode());
+        for(MyListener listener : listeners){   // sends this to interface where a given class is listening.
+            listener.keyMovement(e);
+        }
     }
 
     @Override
