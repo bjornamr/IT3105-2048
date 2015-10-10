@@ -1,10 +1,11 @@
 package GUI;
 
-import Game.Callback;
+import Game.Observer;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.util.List;
+
+import java.util.ArrayList;
+
 
 import javax.swing.JFrame; //imports JFrame library
 import javax.swing.border.MatteBorder;
@@ -22,12 +23,15 @@ public class GUI extends JFrame implements KeyListener {
 
 
 
-
+    private ArrayList<Observer> obsList;
         public GUI(int x, int y) {
+            obsList = new ArrayList(); // initiatiting observerlist
 
             label = new JLabel[x][y];
 
+
             JPanel grid = new JPanel(new GridLayout(x, y, 2, 2));
+            grid.setFocusable(true);
             grid.addKeyListener(this);
 
             grid.setBackground( Color.WHITE );
@@ -37,6 +41,7 @@ public class GUI extends JFrame implements KeyListener {
                 for(int j = 0; j<y; j++) {
                     label[i][j] = new JLabel();
                     label[i][j].setFont(new Font("Serif", Font.BOLD, 60));
+                    //label[i][j].setFocusable(true);
                     //label.setPreferredSize(new Dimension(200,200));
                     //label.setText(" label" + i);
                     label[i][j].setOpaque(true);
@@ -47,7 +52,7 @@ public class GUI extends JFrame implements KeyListener {
 
 
 
-            add( grid );
+            add( grid ); // Makes the size niz.
         }
 
 
@@ -74,7 +79,7 @@ public class GUI extends JFrame implements KeyListener {
 
     public void setTileSize(int numx,int numy,int Dimx,int Dimy){
 
-        label[numx-1][numy-1].setPreferredSize(new Dimension(Dimx,Dimy));
+        label[numx-1][numy-1].setPreferredSize(new Dimension(Dimx, Dimy));
     }
     private void displayInfo(KeyEvent e, String keyStatus) {
 
@@ -108,31 +113,48 @@ public class GUI extends JFrame implements KeyListener {
     public void setTileColor(int x,int y,int number){
         label[x][y].setBackground(getBackGroundColor(number));
     }
+    public void NotifyObservers(KeyEvent keyEvent)
+    {
+        for(Observer obs : obsList)
+        {
+            obs.update(keyEvent);
+        }
+    }
+
+    public void AddObserver(Observer obs)
+    {
+        if (obs != null)
+            obsList.add(obs);
+    }
+
+    public void DelObserver(Observer obs)
+    {
+        if (obs != null)
+            obsList.remove(obs);
+    }
+
+
 
     @Override
     public void keyTyped(KeyEvent e) {
-         System.out.println(e.getKeyCode());
 
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        displayInfo(e, "KEY PRESSED: ");
+        //NotifyObservers(e);
+        System.out.println("2 "+ e.getKeyCode());
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        System.out.println(""+e.getKeyCode());
+
     }
+
 }
 
 
 
 
 
-
-   /* public static void main(String[] args) {
-        GUI r = new GUI(4,4);//makes new ButtonGrid with 2 parameters
-        r.setText(3,3,"Svett");
-    }*/
 //}

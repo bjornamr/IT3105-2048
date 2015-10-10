@@ -39,6 +39,7 @@ public class Game{
     GUI frame;
     public Game(int x,int y) {
         frame = new GUI( x, y);
+        //frame.AddObserver(Game.this);
         GridValues = new int[x][y]; // setting size of grid.
         Merge = new boolean[x][y]; // false on startup
 
@@ -55,6 +56,10 @@ public class Game{
         frame.setVisible(true);
         //this.Grid = new int[x][y];
 
+
+    }
+
+    public void Merge(){
 
     }
 
