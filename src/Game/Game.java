@@ -33,15 +33,13 @@ public class Game implements MyListener{
     private int height;
 
     private final int GOAL = 2048;
+
     ArrayList<Integer> emptyTiles = new ArrayList<Integer>();
-
-
     Random random = new Random();
 
-
     private int[][] GridValues; // Values
-    private boolean[][] Merge; // To check if merging
     GUI frame;
+
     public Game(int x,int y) {
         this.width = x;
         this.height =y;
@@ -49,8 +47,8 @@ public class Game implements MyListener{
         frame = new GUI( x, y);
         frame.addListener(this);
 
-        GridValues = new int[x][y]; // setting size of grid.
-        Merge = new boolean[x][y]; // false on startup
+        this.GridValues = new int[x][y]; // setting size of grid.
+
         Score = 0;
         frame.setSize(800, 800);
         frame.setTileSize(x, y, 200, 200);
@@ -74,7 +72,6 @@ public class Game implements MyListener{
 
     }
 
-
     public ArrayList getEmptyTiles(){  // getting all the empty tiles
         emptyTiles.clear();
         for(int x = 0; x < GridValues.length; x++){
@@ -84,8 +81,6 @@ public class Game implements MyListener{
         }
         return emptyTiles;
     }
-
-
 
     public int i2Dto1D(int x,int rowlength,int y){
         return (x * GridValues.length) + y; // Indexes from 2D to 1D
@@ -98,12 +93,7 @@ public class Game implements MyListener{
     }
 
 
-
-
-
-
-
-    public void setTile(int x, int y, int number) {
+     public void setTile(int x, int y, int number) {
         frame.setTileText(x,y,Integer.toString(number));  // color based on number.
         GridValues[x][y] =number; // setting number to grid
     }
@@ -132,30 +122,14 @@ public class Game implements MyListener{
         return false;
     }
 
-
     public boolean wonGame(){
         for(int i=0; i<GridValues.length; i++){
             for(int j=0; j<GridValues[i].length; j++){
-                if(GridValues[i][j]==2048) return true;
+                if(GridValues[i][j]==GOAL) return true; // Checking for 2048
             }
         }
         return false;
     }
-
-
-
-    public static Color hex2Rgb(String colorStr) {
-        return new Color(
-                Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
-                Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
-                Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
-    }
-
-
-
-
-
-
 
     @Override
     public void keyMovement(KeyEvent e) {  // The callback is processed here. The merging can begin.
