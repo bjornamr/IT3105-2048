@@ -63,6 +63,18 @@ public class Game implements MyListener{
 
     }
 
+    public void redraw(int[][] Grid){
+
+        for(int x = 0; x<Grid.length; x++){
+            for (int y = 0; y<Grid[x].length; y++){
+                setTile(x,y,Grid[x][y]);
+            }
+        }
+
+
+    }
+
+
     public ArrayList getEmptyTiles(){  // getting all the empty tiles
         emptyTiles.clear();
         for(int x = 0; x < GridValues.length; x++){
@@ -85,9 +97,7 @@ public class Game implements MyListener{
         return indexes;
     }
 
-    public void Merge(){
 
-    }
 
 
 
@@ -96,6 +106,11 @@ public class Game implements MyListener{
     public void setTile(int x, int y, int number) {
         frame.setTileText(x,y,Integer.toString(number));  // color based on number.
         GridValues[x][y] =number; // setting number to grid
+    }
+
+    public void removeTile(int x, int y){
+        frame.removeTileText(x,y);
+        GridValues[x][y] = 0;
     }
 
     public void chooseEmptySpot(){ // chooses random spot from all the empty tiles.

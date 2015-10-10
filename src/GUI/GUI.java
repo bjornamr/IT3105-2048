@@ -106,6 +106,11 @@ public class GUI extends JFrame implements KeyListener {
 
     }
 
+    public void removeTileText(int x, int y){
+        label[x][y].setText("");
+        label[x][y].setBackground(new Color(255,255,255));
+    }
+
     public void setTileColor(int x,int y,int number){
         label[x][y].setBackground(getBackGroundColor(number));
     }
