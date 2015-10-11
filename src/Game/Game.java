@@ -57,8 +57,13 @@ public class Game implements MyListener {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         //this.Grid = new int[x][y];
+        newGame();
 
+    }
 
+    public void newGame(){
+        chooseEmptySpot();
+        chooseEmptySpot();
     }
 
     public void redraw(int[][] Grid) {
@@ -360,7 +365,7 @@ public class Game implements MyListener {
                 System.out.println("DOWN");
                 merge = mergeTilesDown();
                 move = moveDown();
-                if(!merge || move) {
+                if(merge || move) {
                     chooseEmptySpot();
                 }
                 break;
@@ -369,7 +374,7 @@ public class Game implements MyListener {
                 System.out.println("LEFT");
                 merge = mergeTilesLeft();
                 move = moveLeft();
-                if(!merge || move) {
+                if(merge || move) {
                     chooseEmptySpot();
                 }
                 break;
@@ -378,7 +383,7 @@ public class Game implements MyListener {
                 System.out.println("RIGHT");
                 merge = mergeTilesRight();
                 move = moveRight();
-                if(!merge && !move) {
+                if(merge || move) {
                     chooseEmptySpot();
                 }
                 break;
