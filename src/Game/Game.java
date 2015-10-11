@@ -237,6 +237,7 @@ public class Game implements MyListener {
     }
 
     public boolean moveLeft(){
+        boolean moved = false;
         for(int i = 0;i<GridValues.length;i++){
             Integer[] a = new Integer[GridValues[i].length];
             for(int j = 0;j<GridValues[i].length;j++){
@@ -246,11 +247,15 @@ public class Game implements MyListener {
             Arrays.sort(a, new CompareTiles().LEFT);
             for(int j = 0;j<GridValues[i].length;j++){
                 setTile(i,j, (int)a[j]);
+                if((int)a[j] != GridValues[i][j]){
+                    moved = true;
+                }
             }
         }
-        return false;
+        return moved;
     }
     public boolean moveRight(){
+        boolean moved = false;
         for(int i = 0;i<GridValues.length;i++){
             Integer[] a = new Integer[GridValues[i].length];
             for(int j = 0;j<GridValues[i].length;j++){
@@ -260,12 +265,16 @@ public class Game implements MyListener {
             Arrays.sort(a, new CompareTiles().RIGHT);
             for(int j = 0;j<GridValues[i].length;j++){
                 setTile(i,j, (int)a[j]);
+                if((int)a[j] != GridValues[i][j]){
+                    moved = true;
+                }
             }
         }
-        return false;
+        return moved;
     }
 
     public boolean moveUp(){
+        boolean moved = false;
         for(int i = 0;i<GridValues.length;i++){
             Integer[] a = new Integer[GridValues[i].length];
             for(int j = 0;j<GridValues[i].length;j++){
@@ -275,11 +284,19 @@ public class Game implements MyListener {
             Arrays.sort(a, new CompareTiles().UP);
             for(int j = 0;j<GridValues[i].length;j++){
                 setTile(j,i, (int)a[j]);
+                if((int)a[j] != GridValues[i][j]){
+                    moved = true;
+                    if((int)a[j] != GridValues[i][j]){
+                        moved = true;
+                    }
+                }
             }
+
         }
-        return false;
+        return moved;
     }
     public boolean moveDown(){
+        boolean moved = false;
         for(int i = 0;i<GridValues.length;i++){
             Integer[] a = new Integer[GridValues[i].length];
             for(int j = 0;j<GridValues[i].length;j++){
@@ -289,9 +306,12 @@ public class Game implements MyListener {
             Arrays.sort(a, new CompareTiles().DOWN);
             for(int j = 0;j<GridValues[i].length;j++){
                 setTile(j,i, (int)a[j]);
+                if((int)a[j] != GridValues[i][j]){
+                    moved = true;
+                }
             }
         }
-        return false;
+        return moved;
     }
 
 
@@ -323,35 +343,44 @@ public class Game implements MyListener {
 
     @Override
     public void keyMovement(KeyEvent e) {  // The callback is processed here. The merging can begin.
+        boolean merge = false;
+        boolean move = false;
         switch (e.getKeyCode()) {
 
             case UP: // UPs
                 System.out.println("UP");
-                mergeTilesUp();
-                moveUp();
-                chooseEmptySpot();
-
+                merge = mergeTilesUp();
+                move = moveUp();
+                if(merge || move) {
+                    chooseEmptySpot();
+                }
                 break;
 
             case DOWN: // DOWN
                 System.out.println("DOWN");
-                mergeTilesDown();
-                moveDown();
-                chooseEmptySpot();
+                merge = mergeTilesDown();
+                move = moveDown();
+                if(!merge || move) {
+                    chooseEmptySpot();
+                }
                 break;
 
             case LEFT: // LEFT
                 System.out.println("LEFT");
-                mergeTilesLeft();
-                moveLeft();
-                chooseEmptySpot();
+                merge = mergeTilesLeft();
+                move = moveLeft();
+                if(!merge || move) {
+                    chooseEmptySpot();
+                }
                 break;
 
             case RIGHT: // RIGHT
                 System.out.println("RIGHT");
-                mergeTilesRight();
-                moveRight();
-                chooseEmptySpot();
+                merge = mergeTilesRight();
+                move = moveRight();
+                if(!merge && !move) {
+                    chooseEmptySpot();
+                }
                 break;
 
             default:
