@@ -19,7 +19,7 @@ import javax.swing.*;
 public class Game implements MyListener {
 
 
-    private int Score;
+    private int score;
 
 
     private static final String WIN_GAME = "You WON! Tile is 2048";
@@ -37,7 +37,7 @@ public class Game implements MyListener {
     ArrayList<Integer> emptyTiles = new ArrayList<Integer>();
     Random random = new Random();
 
-    private int[][] GridValues; // Values
+    private int[][] gridValues; // Values
     GUI frame;
 
     public Game(int x, int y) {
@@ -47,9 +47,9 @@ public class Game implements MyListener {
         frame = new GUI(x, y);
         frame.addListener(this);
 
-        this.GridValues = new int[x][y]; // setting size of grid.
+        this.gridValues = new int[x][y]; // setting size of grid.
 
-        Score = 0;
+        score = 0;
         frame.setSize(800, 800);
         frame.setTileSize(x, y, 200, 200);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -65,7 +65,7 @@ public class Game implements MyListener {
 
         chooseEmptySpot();
         chooseEmptySpot();
-        Score = 0;
+        score = 0;
 
     }
 
@@ -82,9 +82,9 @@ public class Game implements MyListener {
 
     public ArrayList getEmptyTiles() {  // getting all the empty tiles
         emptyTiles.clear();
-        for (int x = 0; x < GridValues.length; x++) {
-            for (int y = 0; y < GridValues[x].length; y++) {
-                if (isEmpty(x, y)) emptyTiles.add(i2Dto1D(x, GridValues.length, y));
+        for (int x = 0; x < gridValues.length; x++) {
+            for (int y = 0; y < gridValues[x].length; y++) {
+                if (isEmpty(x, y)) emptyTiles.add(i2Dto1D(x, gridValues.length, y));
             }
         }
         return emptyTiles;
@@ -92,7 +92,7 @@ public class Game implements MyListener {
 
 
     public int i2Dto1D(int x, int rowlength, int y) {
-        return (x * GridValues.length) + y; // Indexes from 2D to 1D
+        return (x * gridValues.length) + y; // Indexes from 2D to 1D
     }
 
     public int[] i1Dto2D(int index) {
@@ -107,16 +107,19 @@ public class Game implements MyListener {
 
             frame.setTileText(x, y, Integer.toString(number));  // color based on number.
 
-        GridValues[x][y] = number; // setting number to grid
+        gridValues[x][y] = number; // setting number to grid
     }
 
     public void removeTile(int x, int y) {
         frame.removeTileText(x, y);
-        GridValues[x][y] = 0;
+        gridValues[x][y] = 0;
     }
 
-    public int[][] getGridValues(){
-        return GridValues;
+    public int[][] getgridValues(){
+        return gridValues;
+    }
+    public int getScore(){
+        return score;
     }
 
     public void chooseEmptySpot() { // chooses random spot from all the empty tiles.
@@ -141,16 +144,18 @@ public class Game implements MyListener {
             for (int j = 0; j < height; j++) {
                 if (isEmpty(j, i)) {
 
-                } else if (GridValues[j][i] == lastValue) {
+                } else if (gridValues[j][i] == lastValue) {
                     setTile(x, y, (lastValue * 2));
                     removeTile(j, i);
+                    score += lastValue*2;
                     lastValue = 0;
                     merged = true;
+
                 }
                 if (isEmpty(j, i)) {
 
                 } else {
-                    lastValue = GridValues[j][i];
+                    lastValue = gridValues[j][i];
                     x = j;
                     y = i;
                 }
@@ -171,16 +176,17 @@ public class Game implements MyListener {
             for (int j = height -1; j>-1;j--) {
                 if (isEmpty(j, i)) {
 
-                } else if (GridValues[j][i] == lastValue) {
+                } else if (gridValues[j][i] == lastValue) {
                     setTile(x, y, (lastValue * 2));
                     removeTile(j, i);
+                    score+= lastValue*2;
                     lastValue = 0;
                     merged = true;
                 }
                 if (isEmpty(j, i)) {
 
                 } else {
-                    lastValue = GridValues[j][i];
+                    lastValue = gridValues[j][i];
                     x = j;
                     y = i;
                 }
@@ -201,16 +207,17 @@ public class Game implements MyListener {
             for (int j = 0 ; j < height;j++) {
                 if (isEmpty(i, j)) {
 
-                } else if (GridValues[i][j] == lastValue) {
+                } else if (gridValues[i][j] == lastValue) {
                     setTile(x, y, (lastValue * 2));
                     removeTile(i, j);
+                    score+= lastValue*2;
                     lastValue = 0;
                     merged = true;
                 }
                 if (isEmpty(i, j)) {
 
                 } else {
-                    lastValue = GridValues[i][j];
+                    lastValue = gridValues[i][j];
                     x = i;
                     y = j;
                 }
@@ -231,16 +238,17 @@ public class Game implements MyListener {
             for (int j = height-1 ; j > -1;j--) {
                 if (isEmpty(i, j)) {
 
-                } else if (GridValues[i][j] == lastValue) {
+                } else if (gridValues[i][j] == lastValue) {
                     setTile(x, y, (lastValue * 2));
                     removeTile(i, j);
+                    score+=lastValue*2;
                     lastValue = 0;
                     merged = false;
                 }
                 if (isEmpty(i, j)) {
 
                 } else {
-                    lastValue = GridValues[i][j];
+                    lastValue = gridValues[i][j];
                     x = i;
                     y = j;
                 }
@@ -251,15 +259,15 @@ public class Game implements MyListener {
 
     public boolean moveLeft(){
         boolean moved = false;
-        for(int i = 0;i<GridValues.length;i++){
-            Integer[] a = new Integer[GridValues[i].length];
-            for(int j = 0;j<GridValues[i].length;j++){
-                a[j] = Integer.valueOf(GridValues[i][j]);
+        for(int i = 0;i<gridValues.length;i++){
+            Integer[] a = new Integer[gridValues[i].length];
+            for(int j = 0;j<gridValues[i].length;j++){
+                a[j] = Integer.valueOf(gridValues[i][j]);
             }
 
             Arrays.sort(a, new CompareTiles().LEFT);
-            for(int j = 0;j<GridValues[i].length;j++){
-                if((int)a[j] != GridValues[i][j]){
+            for(int j = 0;j<gridValues[i].length;j++){
+                if((int)a[j] != gridValues[i][j]){
                     moved = true;
                 }
                 setTile(i,j, (int)a[j]);
@@ -270,15 +278,15 @@ public class Game implements MyListener {
     }
     public boolean moveRight(){
         boolean moved = false;
-        for(int i = 0;i<GridValues.length;i++){
-            Integer[] a = new Integer[GridValues[i].length];
-            for(int j = 0;j<GridValues[i].length;j++){
-                a[j] = Integer.valueOf(GridValues[i][j]);
+        for(int i = 0;i<gridValues.length;i++){
+            Integer[] a = new Integer[gridValues[i].length];
+            for(int j = 0;j<gridValues[i].length;j++){
+                a[j] = Integer.valueOf(gridValues[i][j]);
             }
 
             Arrays.sort(a, new CompareTiles().RIGHT);
-            for(int j = 0;j<GridValues[i].length;j++){
-                if((int)a[j] != GridValues[i][j]){
+            for(int j = 0;j<gridValues[i].length;j++){
+                if((int)a[j] != gridValues[i][j]){
                     moved = true;
                 }
                 setTile(i,j, (int)a[j]);
@@ -290,15 +298,15 @@ public class Game implements MyListener {
 
     public boolean moveUp(){
         boolean moved = false;
-        for(int i = 0;i<GridValues.length;i++){
-            Integer[] a = new Integer[GridValues[i].length];
-            for(int j = 0;j<GridValues[i].length;j++){
-                a[j] = Integer.valueOf(GridValues[j][i]);
+        for(int i = 0;i<gridValues.length;i++){
+            Integer[] a = new Integer[gridValues[i].length];
+            for(int j = 0;j<gridValues[i].length;j++){
+                a[j] = Integer.valueOf(gridValues[j][i]);
             }
 
             Arrays.sort(a, new CompareTiles().UP);
-            for(int j = 0;j<GridValues[i].length;j++){
-                if((int)a[j] != GridValues[j][i]){
+            for(int j = 0;j<gridValues[i].length;j++){
+                if((int)a[j] != gridValues[j][i]){
                     System.out.println("TRUE");
                     moved = true;
                 }
@@ -311,15 +319,15 @@ public class Game implements MyListener {
     }
     public boolean moveDown(){
         boolean moved = false;
-        for(int i = 0;i<GridValues.length;i++){
-            Integer[] a = new Integer[GridValues[i].length];
-            for(int j = 0;j<GridValues[i].length;j++){
-                a[j] = Integer.valueOf(GridValues[j][i]);
+        for(int i = 0;i<gridValues.length;i++){
+            Integer[] a = new Integer[gridValues[i].length];
+            for(int j = 0;j<gridValues[i].length;j++){
+                a[j] = Integer.valueOf(gridValues[j][i]);
             }
 
             Arrays.sort(a, new CompareTiles().DOWN);
-            for(int j = 0;j<GridValues[i].length;j++){
-                if((int)a[j] != GridValues[j][i]){
+            for(int j = 0;j<gridValues[i].length;j++){
+                if((int)a[j] != gridValues[j][i]){
                     moved = true;
                 }
                 setTile(j,i, (int)a[j]);
@@ -336,14 +344,14 @@ public class Game implements MyListener {
     }
 
     public boolean isEmpty(int x, int y) {
-        if (GridValues[x][y] == 0) return true;
+        if (gridValues[x][y] == 0) return true;
         return false;
     }
 
     public boolean wonGame() {
-        for (int i = 0; i < GridValues.length; i++) {
-            for (int j = 0; j < GridValues[i].length; j++) {
-                if (GridValues[i][j] == GOAL) return true; // Checking for 2048
+        for (int i = 0; i < gridValues.length; i++) {
+            for (int j = 0; j < gridValues[i].length; j++) {
+                if (gridValues[i][j] == GOAL) return true; // Checking for 2048
             }
         }
         return false;
@@ -356,7 +364,6 @@ public class Game implements MyListener {
         switch (e.getKeyCode()) {
 
             case UP: // UPs
-                System.out.println("UP");
                 merge = mergeTilesUp();
                 move = moveUp();
                 if(merge || move) {
@@ -365,7 +372,6 @@ public class Game implements MyListener {
                 break;
 
             case DOWN: // DOWN
-                System.out.println("DOWN");
                 merge = mergeTilesDown();
                 move = moveDown();
                 if(merge || move) {
@@ -374,7 +380,6 @@ public class Game implements MyListener {
                 break;
 
             case LEFT: // LEFT
-                System.out.println("LEFT");
                 merge = mergeTilesLeft();
                 move = moveLeft();
                 if(merge || move) {
@@ -383,7 +388,6 @@ public class Game implements MyListener {
                 break;
 
             case RIGHT: // RIGHT
-                System.out.println("RIGHT");
                 merge = mergeTilesRight();
                 move = moveRight();
                 if(merge || move) {
@@ -392,7 +396,6 @@ public class Game implements MyListener {
                 break;
 
             default:
-                System.out.println("WRONG FUCKING KEY");
         }
     }
 
