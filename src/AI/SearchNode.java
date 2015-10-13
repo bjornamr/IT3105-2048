@@ -7,24 +7,22 @@ import java.util.ArrayList;
  */
 public class SearchNode {
 
-    private int EmptySize;
-    private int NodeValue;
-    private int[][] State;
+    private int emptySize;
+    private int nodeValue;
+    private int[][] state;
 
-    public SearchNode(int score,ArrayList emptycells,int[][] Gridval){
-        this.EmptySize = emptycells.size();
-        this.NodeValue = score;
+    public SearchNode(int score,ArrayList emptycells,int[][] gridVal){
+        this.emptySize = emptycells.size();
+        this.nodeValue = score;
 
-        for (int i =0; i<Gridval.length; i++){
-            for(int j=0; j<Gridval[i].length; j++){
-                this.State = new int[Gridval.length][Gridval[i].length];
-                this.State[i][j] = Gridval[i][j];
+        for (int i =0; i<gridVal.length; i++){
+            for(int j=0; j<gridVal[i].length; j++){
+                this.state = new int[gridVal.length][gridVal[i].length];
+                this.state[i][j] = gridVal[i][j];
             }
         }
 
     }
-
-
 
 
     public int heuristicScore(int actualScore, int numberOfEmptyCells, int clusteringScore) {
