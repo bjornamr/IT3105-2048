@@ -132,7 +132,7 @@ public class Game implements MyListener {
 
     }
 
-    public boolean mergeTilesUp() {
+    public boolean mergeTilesUp(int[][] gridValues) {
         boolean merged = false;
         int lastValue;
         int x;
@@ -164,7 +164,7 @@ public class Game implements MyListener {
         return merged;
     }
 
-    public boolean mergeTilesDown() {
+    public boolean mergeTilesDown(int[][] gridValues) {
         boolean merged = false;
         int lastValue = -1;
         int x;
@@ -195,7 +195,7 @@ public class Game implements MyListener {
         return merged;
     }
 
-    public boolean mergeTilesLeft() {
+    public boolean mergeTilesLeft(int[][] gridValues) {
         boolean merged = false;
         int lastValue;
         int x;
@@ -226,7 +226,7 @@ public class Game implements MyListener {
         return merged;
     }
 
-    public boolean mergeTilesRight() {
+    public boolean mergeTilesRight(int[][] gridValues) {
         boolean merged = false;
         int lastValue;
         int x;
@@ -257,7 +257,7 @@ public class Game implements MyListener {
         return merged;
     }
 
-    public boolean moveLeft(){
+    public boolean moveLeft(int[][] gridValues){
         boolean moved = false;
         for(int i = 0;i<gridValues.length;i++){
             Integer[] a = new Integer[gridValues[i].length];
@@ -276,7 +276,7 @@ public class Game implements MyListener {
         }
         return moved;
     }
-    public boolean moveRight(){
+    public boolean moveRight(int[][] gridValues){
         boolean moved = false;
         for(int i = 0;i<gridValues.length;i++){
             Integer[] a = new Integer[gridValues[i].length];
@@ -296,7 +296,7 @@ public class Game implements MyListener {
         return moved;
     }
 
-    public boolean moveUp(){
+    public boolean moveUp(int[][] gridValues){
         boolean moved = false;
         for(int i = 0;i<gridValues.length;i++){
             Integer[] a = new Integer[gridValues[i].length];
@@ -317,7 +317,8 @@ public class Game implements MyListener {
         }
         return moved;
     }
-    public boolean moveDown(){
+
+    public boolean moveDown(int[][] gridValues){
         boolean moved = false;
         for(int i = 0;i<gridValues.length;i++){
             Integer[] a = new Integer[gridValues[i].length];
@@ -364,32 +365,32 @@ public class Game implements MyListener {
         switch (e.getKeyCode()) {
 
             case UP: // UPs
-                merge = mergeTilesUp();
-                move = moveUp();
+                merge = mergeTilesUp(gridValues);
+                move = moveUp(gridValues);
                 if(merge || move) {
                     chooseEmptySpot();
                 }
                 break;
 
             case DOWN: // DOWN
-                merge = mergeTilesDown();
-                move = moveDown();
+                merge = mergeTilesDown(gridValues);
+                move = moveDown(gridValues);
                 if(merge || move) {
                     chooseEmptySpot();
                 }
                 break;
 
             case LEFT: // LEFT
-                merge = mergeTilesLeft();
-                move = moveLeft();
+                merge = mergeTilesLeft(gridValues);
+                move = moveLeft(gridValues);
                 if(merge || move) {
                     chooseEmptySpot();
                 }
                 break;
 
             case RIGHT: // RIGHT
-                merge = mergeTilesRight();
-                move = moveRight();
+                merge = mergeTilesRight(gridValues);
+                move = moveRight(gridValues);
                 if(merge || move) {
                     chooseEmptySpot();
                 }
@@ -397,6 +398,7 @@ public class Game implements MyListener {
 
             default:
         }
+
     }
 
     public class CompareTiles{
