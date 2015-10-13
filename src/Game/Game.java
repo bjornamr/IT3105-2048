@@ -161,6 +161,10 @@ public class Game implements MyListener {
                 }
             }
         }
+        boolean moved = moveUp(gridValues);
+        if(moved || merged){
+            return true;
+        }
         return merged;
     }
 
@@ -191,6 +195,10 @@ public class Game implements MyListener {
                     y = i;
                 }
             }
+        }
+        boolean moved = moveDown(gridValues);
+        if(moved || merged){
+            return true;
         }
         return merged;
     }
@@ -223,6 +231,10 @@ public class Game implements MyListener {
                 }
             }
         }
+        boolean moved = moveLeft(gridValues);
+        if(moved || merged){
+            return true;
+        }
         return merged;
     }
 
@@ -254,7 +266,12 @@ public class Game implements MyListener {
                 }
             }
         }
-        return merged;
+        boolean moved = moveRight(gridValues);
+        if(moved || merged){
+            return true;
+        }
+
+        return false;
     }
 
     public boolean moveLeft(int[][] gridValues){
@@ -365,33 +382,25 @@ public class Game implements MyListener {
         switch (e.getKeyCode()) {
 
             case UP: // UPs
-                merge = mergeTilesUp(gridValues);
-                move = moveUp(gridValues);
-                if(merge || move) {
+                if(mergeTilesUp(gridValues)) {
                     chooseEmptySpot();
                 }
                 break;
 
             case DOWN: // DOWN
-                merge = mergeTilesDown(gridValues);
-                move = moveDown(gridValues);
-                if(merge || move) {
+                if(mergeTilesDown(gridValues)) {
                     chooseEmptySpot();
                 }
                 break;
 
-            case LEFT: // LEFT
-                merge = mergeTilesLeft(gridValues);
-                move = moveLeft(gridValues);
-                if(merge || move) {
+            case LEFT: // LEFT;
+                if(mergeTilesLeft(gridValues)) {
                     chooseEmptySpot();
                 }
                 break;
 
             case RIGHT: // RIGHT
-                merge = mergeTilesRight(gridValues);
-                move = moveRight(gridValues);
-                if(merge || move) {
+                if(mergeTilesRight(gridValues)) {
                     chooseEmptySpot();
                 }
                 break;
