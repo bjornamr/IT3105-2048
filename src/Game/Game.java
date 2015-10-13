@@ -62,8 +62,11 @@ public class Game implements MyListener {
     }
 
     public void newGame(){
+
         chooseEmptySpot();
         chooseEmptySpot();
+        Score = 0;
+
     }
 
     public void redraw(int[][] Grid) {
@@ -87,6 +90,7 @@ public class Game implements MyListener {
         return emptyTiles;
     }
 
+
     public int i2Dto1D(int x, int rowlength, int y) {
         return (x * GridValues.length) + y; // Indexes from 2D to 1D
     }
@@ -109,6 +113,10 @@ public class Game implements MyListener {
     public void removeTile(int x, int y) {
         frame.removeTileText(x, y);
         GridValues[x][y] = 0;
+    }
+
+    public int[][] getGridValues(){
+        return GridValues;
     }
 
     public void chooseEmptySpot() { // chooses random spot from all the empty tiles.
@@ -322,13 +330,6 @@ public class Game implements MyListener {
     }
 
 
-
-    public boolean compare(int a, int b) {
-        if (a == b) {
-            return true;
-        }
-        return false;
-    }
 
     public int genTwosfours() {
         return Math.random() < 0.9 ? 2 : 4; // generating 2s 90 perecent of the time.
