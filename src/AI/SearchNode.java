@@ -5,6 +5,9 @@ import java.util.ArrayList;
 /**
  * Created by Bjornars on 13.10.2015.
  */
+
+
+
 public class SearchNode {
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
@@ -30,6 +33,8 @@ public class SearchNode {
 
     }
 
+
+
     public SearchNode(SearchNode copy, int movement){
         this.movement = movement;
         emptySize = copy.emptySize;
@@ -43,8 +48,9 @@ public class SearchNode {
     }
 
     public int getHeuristicScore() {
-        int score = (int) (nodeValue+Math.log(nodeValue)*emptySize -clusteringScore);
-        return Math.max(score, Math.min(nodeValue, 1));
+        //int score = (int) (nodeValue+Math.log(nodeValue)*emptySize -clusteringScore);
+        //return Math.max(score, Math.min(nodeValue, 1));
+        return -1;
     }
 
     public int[][] getGridValues(){

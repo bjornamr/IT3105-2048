@@ -80,7 +80,7 @@ public class Game implements MyListener {
 
     }
 
-    public ArrayList getEmptyTiles() {  // getting all the empty tiles
+    public ArrayList getEmptyTiles(int[][] gridValues) {  // getting all the empty tiles
         emptyTiles.clear();
         for (int x = 0; x < gridValues.length; x++) {
             for (int y = 0; y < gridValues[x].length; y++) {
@@ -123,7 +123,7 @@ public class Game implements MyListener {
     }
 
     public void chooseEmptySpot() { // chooses random spot from all the empty tiles.
-        ArrayList arr = getEmptyTiles();
+        ArrayList arr = getEmptyTiles(gridValues);
         if (arr.size() != 0) {
             int randomIndex = random.nextInt(arr.size()); // index from emptyTiles
             int[] emptyindex = i1Dto2D((int) arr.get(randomIndex));  // index is now X and Y

@@ -15,29 +15,29 @@ public class MinMax {
 
 
     public int minMax(SearchNode node, int depth, boolean maximizing){
-        if( depth =0 || node.isTerminal()){
+        if( depth ==0){
             return node.getHeuristicScore();
         }
         if (maximizing){
             int bestValue = 999999999;
-            for(SearchNode child: getMaxChildren()){
+            for(SearchNode child: getMaxChildren(node)) {
                 bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
 
             }
             return bestValue;
         }else{
             int bestValue = 999999999;
-            for(SearchNode child: getMinChildren(node)){
-                bestValue = Math.min(bestValue, minMax(child,depth-1,true));
+           // for(SearchNode child: getMinChildren(node)){
+            //    bestValue = Math.min(bestValue, minMax(child,depth-1,true));
 
-            }
+           // }
             return bestValue;
         }
-        return -1;
+
     }
 
     // TODO: test if normal array is faster
-    public ArrayList<SearchNode> getMinChildren(SearchNode parent){
+    public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
         ArrayList<SearchNode> returnArray = new ArrayList();// {new SearchNode(parent, SearchNode.LEFT),new SearchNode(parent,SearchNode.RIGHT), new SearchNode(parent,SearchNode.UP),new SearchNode(parent,SearchNode.DOWN)};
         SearchNode temp = new SearchNode(parent, SearchNode.LEFT);
         if(game.mergeTilesLeft(temp.getGridValues())){
@@ -58,7 +58,37 @@ public class MinMax {
         return returnArray;
 
     }
-    public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
+
+    public ArrayList getEmptyTiles(int[][] state){
+        return game.getEmptyTiles(state);
+    }
+    public ArrayList<SearchNode> getMinChildren(SearchNode parent){
+        int[][] gridval = parent.getGridValues();
+        ArrayList empty = getEmptyTiles(gridval);
+        ArrayList<SearchNode> sn = new ArrayList<>();
+        for(int i =0; i<empty.size(); i++){
+            int[] xy = game.i1Dto2D((int)empty.get(i));
+            int[][] newArray= new int[gridval.length][gridval[0].length]; // fix
+            int[][] newArray2 = new int[gridval.length][gridval[0].length];
+            for(int j =0; j<gridval.length; j++){
+                    for(int k=0; k<gridval[j].length; k++){
+                    newArray[j][k] = gridval[j][k];
+                    newArray2[j][k] = gridval[j][k];
+                }
+            }
+            newArray[xy[0]][xy[1]] =2;
+            newArray2[xy[0]][xy[1]] =4;
+
+
+            /// hardcopy score....
+
+
+            //sn.add(SearchNode(score,empty.size-1,newArray));
+            //sn.add(SearchNode(score2,empty.size-1,newArray2));
+        }
+        return null;
+
+
 
     }
 }
