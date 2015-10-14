@@ -40,19 +40,19 @@ public class MinMax {
     public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
         ArrayList<SearchNode> returnArray = new ArrayList();// {new SearchNode(parent, SearchNode.LEFT),new SearchNode(parent,SearchNode.RIGHT), new SearchNode(parent,SearchNode.UP),new SearchNode(parent,SearchNode.DOWN)};
         SearchNode temp = new SearchNode(parent, SearchNode.LEFT);
-        if(game.mergeTilesLeft(temp.getGridValues())){
+        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore())){ // CHECK this? Does it need to be individual ints for temp.getscore?
             returnArray.add(temp);
         }
         temp = new SearchNode(parent, SearchNode.RIGHT);
-        if(game.mergeTilesLeft(temp.getGridValues())){
+        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore())){
             returnArray.add(temp);
         }
         temp = new SearchNode(parent, SearchNode.UP);
-        if(game.mergeTilesLeft(temp.getGridValues())){
+        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore())){
             returnArray.add(temp);
         }
         temp = new SearchNode(parent, SearchNode.DOWN);
-        if(game.mergeTilesLeft(temp.getGridValues())){
+        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore())){
             returnArray.add(temp);
         }
         return returnArray;

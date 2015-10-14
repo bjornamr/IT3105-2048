@@ -132,7 +132,7 @@ public class Game implements MyListener {
 
     }
 
-    public boolean mergeTilesUp(int[][] gridValues) {
+    public boolean mergeTilesUp(int[][] gridValues, int score) {
         boolean merged = false;
         int lastValue;
         int x;
@@ -168,7 +168,7 @@ public class Game implements MyListener {
         return merged;
     }
 
-    public boolean mergeTilesDown(int[][] gridValues) {
+    public boolean mergeTilesDown(int[][] gridValues, int score) {
         boolean merged = false;
         int lastValue = -1;
         int x;
@@ -203,7 +203,7 @@ public class Game implements MyListener {
         return merged;
     }
 
-    public boolean mergeTilesLeft(int[][] gridValues) {
+    public boolean mergeTilesLeft(int[][] gridValues, int score) {
         boolean merged = false;
         int lastValue;
         int x;
@@ -238,7 +238,7 @@ public class Game implements MyListener {
         return merged;
     }
 
-    public boolean mergeTilesRight(int[][] gridValues) {
+    public boolean mergeTilesRight(int[][] gridValues, int score) {
         boolean merged = false;
         int lastValue;
         int x;
@@ -362,8 +362,7 @@ public class Game implements MyListener {
     }
 
     public boolean isEmpty(int x, int y) {
-        if (gridValues[x][y] == 0) return true;
-        return false;
+        return gridValues[x][y] == 0;
     }
 
     public boolean wonGame() {
@@ -382,25 +381,25 @@ public class Game implements MyListener {
         switch (e.getKeyCode()) {
 
             case UP: // UPs
-                if(mergeTilesUp(gridValues)) {
+                if(mergeTilesUp(gridValues,score)) {
                     chooseEmptySpot();
                 }
                 break;
 
             case DOWN: // DOWN
-                if(mergeTilesDown(gridValues)) {
+                if(mergeTilesDown(gridValues,score)) {
                     chooseEmptySpot();
                 }
                 break;
 
             case LEFT: // LEFT;
-                if(mergeTilesLeft(gridValues)) {
+                if(mergeTilesLeft(gridValues,score)) {
                     chooseEmptySpot();
                 }
                 break;
 
             case RIGHT: // RIGHT
-                if(mergeTilesRight(gridValues)) {
+                if(mergeTilesRight(gridValues,score)) {
                     chooseEmptySpot();
                 }
                 break;

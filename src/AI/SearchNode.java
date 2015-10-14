@@ -32,7 +32,14 @@ public class SearchNode {
         }
 
     }
+    public int getScore(){
+        return nodeValue;
+    }
 
+
+    public int getClusteringScore(){
+        return -1;
+    }
 
 
     public SearchNode(SearchNode copy, int movement){
@@ -48,9 +55,8 @@ public class SearchNode {
     }
 
     public int getHeuristicScore() {
-        //int score = (int) (nodeValue+Math.log(nodeValue)*emptySize -clusteringScore);
-        //return Math.max(score, Math.min(nodeValue, 1));
-        return -1;
+        int score = (int) (nodeValue+Math.log(nodeValue)*emptySize -getClusteringScore());
+        return Math.max(score, Math.min(nodeValue, 1));
     }
 
     public int[][] getGridValues(){
