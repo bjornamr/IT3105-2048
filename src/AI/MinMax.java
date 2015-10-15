@@ -1,8 +1,7 @@
 package AI;
 import Game.Game;
-import com.sun.org.apache.bcel.internal.generic.NEW;
+import Game.GameState;
 
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 /**
@@ -22,7 +21,7 @@ public class MinMax {
         SearchNode currentNode = startNode;
         while(true) {
             try{
-               // Thread.sleep(100);
+               // Thread.sleep(2000);
             }catch (Exception e){
 
             }
@@ -32,7 +31,8 @@ public class MinMax {
             }
             //System.out.println("Current movement: " + currentBestValue.getMovement());
             game.movement(currentBestValue.getMovement());
-            currentNode = new SearchNode(game.getScore(), game.getEmptyTiles(game.getgridValues()),game.getgridValues());
+            game.getEmptyTiles(game.getBoardValues()).size();
+            currentNode = new SearchNode(game.getScore(), game.getEmptyTiles(game.getBoardValues()), game.getBoardValues());
         }
     }
 
@@ -72,24 +72,27 @@ public class MinMax {
     public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
         ArrayList<SearchNode> returnArray = new ArrayList();// {new SearchNode(parent, SearchNode.LEFT),new SearchNode(parent,SearchNode.RIGHT), new SearchNode(parent,SearchNode.UP),new SearchNode(parent,SearchNode.DOWN)};
         SearchNode temp = new SearchNode(parent, Game.LEFT);
-        if(temp.mergeTilesLeft()){ // CHECK this? Does it need to be individual ints for temp.getscore?
+        temp.setState(game.mergeTilesLeft(temp.getState(), false));
+        if(temp.getState().isChanged()){
             returnArray.add(temp);
         }
         temp = new SearchNode(parent, Game.RIGHT);
-        if(temp.mergeTilesRight()){
+        temp.setState(game.mergeTilesRight(temp.getState(), false));
+        if(temp.getState().isChanged()){
             returnArray.add(temp);
         }
 
         temp = new SearchNode(parent, Game.UP);
-        if(temp.mergeTilesUp()) {
+        temp.setState(game.mergeTilesUp(temp.getState(),false));
+        if(temp.getState().isChanged()) {
             returnArray.add(temp);
         }
         temp = new SearchNode(parent, Game.DOWN);
-        if (temp.mergeTilesDown()) {
+        temp.setState(game.mergeTilesDown(temp.getState(),false));
+        if (temp.getState().isChanged()) {
             returnArray.add(temp);
         }
         return returnArray;
-
     }
 
     public ArrayList getEmptyTiles(int[][] state){
@@ -118,9 +121,12 @@ public class MinMax {
 
                 /// hardcopy score....
 
-
-                sn.add(new SearchNode(parent,newArray));
-                sn.add(new SearchNode(parent,newArray2));
+                SearchNode temp = new SearchNode(parent);
+                temp.setBoard(newArray);
+                sn.add(temp);
+                temp = new SearchNode(parent);
+                temp.setBoard(newArray2);
+                sn.add(temp);
             }
         }
 

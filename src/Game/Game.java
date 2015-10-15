@@ -10,7 +10,6 @@ https://github.com/bulenkov/2048/blob/master/src/com/bulenkov/game2048/Game2048.
 
 import GUI.GUI;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import javax.swing.*;
@@ -37,8 +36,8 @@ public class Game implements MyListener {
     private ArrayList<Integer> emptyTiles = new ArrayList<>();
     private Random random = new Random();
 
-    private int[][] gridValues; // Values
-    GUI frame;
+    private int[][] board; // Values
+    private GUI frame;
 
     public Game(int x, int y) {
         this.width = x;
@@ -47,7 +46,7 @@ public class Game implements MyListener {
         frame = new GUI(x, y);
         frame.addListener(this);
 
-        this.gridValues = new int[x][y]; // setting size of grid.
+        this.board = new int[x][y]; // setting size of grid.
 
         score = 0;
         frame.setSize(800, 800);
@@ -92,7 +91,7 @@ public class Game implements MyListener {
 
 
     public int i2Dto1D(int x, int rowlength, int y) {
-        return (x * gridValues.length) + y; // Indexes from 2D to 1D
+        return (x * board.length) + y; // Indexes from 2D to 1D
     }
 
     public int[] i1Dto2D(int index) {
@@ -105,17 +104,17 @@ public class Game implements MyListener {
 
     public void setTile(int x, int y, int number) {
         frame.setTileText(x, y, Integer.toString(number));  // color based on number.
-
-        gridValues[x][y] = number; // setting number to grid
+        board[x][y] = number; // setting number to grid
     }
+
 
     public void removeTile(int x, int y) {
         frame.removeTileText(x, y);
-        gridValues[x][y] = 0;
+        board[x][y] = 0;
     }
 
-    public int[][] getgridValues() {
-        return gridValues;
+    public int[][] getBoardValues() {
+        return board;
     }
 
     public int getScore() {
@@ -123,7 +122,7 @@ public class Game implements MyListener {
     }
 
     public void chooseEmptySpot() { // chooses random spot from all the empty tiles.
-        ArrayList arr = getEmptyTiles(gridValues);
+        ArrayList arr = getEmptyTiles(board);
         if (arr.size() != 0) {
             int randomIndex = random.nextInt(arr.size()); // index from emptyTiles
             int[] emptyindex = i1Dto2D((int) arr.get(randomIndex));  // index is now X and Y
@@ -132,8 +131,7 @@ public class Game implements MyListener {
 
     }
 
-    public boolean mergeTilesUp(int[][] gridValues, int score, boolean move) {
-        boolean merged = false;
+    public GameState mergeTilesUp(GameState state, boolean move) {
         int lastValue;
         int x;
         int y;
@@ -142,36 +140,36 @@ public class Game implements MyListener {
             x = -1;
             y = -1;
             for (int j = 0; j < height; j++) {
-                if (isEmpty(j, i)) {
+                if (state.getBoard()[j][i]==0) {
 
-                } else if (gridValues[j][i] == lastValue) {
+                } else if (state.getBoard()[j][i] == lastValue) {
+                    //Moves game board
                     if (move) {
                         setTile(x, y, (lastValue * 2));
                         removeTile(j, i);
+
                     }
-                    score += lastValue * 2;
+                    state.setTile(x,y,(lastValue * 2));
+                    state.removeTile(j,i);
+                    state.addToScore(lastValue*2);
+                    state.setEmptyTiles(state.getEmptyTiles() - 1);
                     lastValue = 0;
-                    merged = true;
+                    state.setChanged(true);
 
                 }
-                if (isEmpty(j, i)) {
+                if (state.getBoard()[j][i] == 0) {
 
                 } else {
-                    lastValue = gridValues[j][i];
+                    lastValue = state.getBoard()[j][i];
                     x = j;
                     y = i;
                 }
             }
         }
-        boolean moved = moveUp(gridValues, move);
-        if (moved || merged) {
-            return true;
-        }
-        return merged;
+        return moveUp(state, move);
     }
 
-    public boolean mergeTilesDown(int[][] gridValues, int score, boolean move) {
-        boolean merged = false;
+    public GameState mergeTilesDown(GameState state, boolean move) {
         int lastValue = -1;
         int x;
         int y;
@@ -180,35 +178,35 @@ public class Game implements MyListener {
             x = -1;
             y = -1;
             for (int j = height - 1; j > -1; j--) {
-                if (isEmpty(j, i)) {
+                if (state.getBoard()[j][i] == 0) {
 
-                } else if (gridValues[j][i] == lastValue) {
+                } else if (state.getBoard()[j][i] == lastValue) {
+                    //Moves game board
                     if (move) {
                         setTile(x, y, (lastValue * 2));
                         removeTile(j, i);
                     }
-                    score += lastValue * 2;
+                    state.setTile(x,y,(lastValue * 2));
+                    state.removeTile(j,i);
+                    state.addToScore(lastValue * 2);
+                    state.setEmptyTiles(state.getEmptyTiles()-1);
                     lastValue = 0;
-                    merged = true;
+                    state.setChanged(true);
                 }
-                if (isEmpty(j, i)) {
+                if (state.getBoard()[j][i]==0) {
 
                 } else {
-                    lastValue = gridValues[j][i];
+                    lastValue = state.getBoard()[j][i];
                     x = j;
                     y = i;
                 }
             }
         }
-        boolean moved = moveDown(gridValues, move);
-        if (moved || merged) {
-            return true;
-        }
-        return merged;
+        return moveDown(state, move);
+
     }
 
-    public boolean mergeTilesLeft(int[][] gridValues, int score, boolean move) {
-        boolean merged = false;
+    public GameState mergeTilesLeft(GameState state, boolean move) {
         int lastValue;
         int x;
         int y;
@@ -217,35 +215,35 @@ public class Game implements MyListener {
             x = -1;
             y = -1;
             for (int j = 0; j < height; j++) {
-                if (isEmpty(i, j)) {
+                if (state.getBoard()[i][j]==0) {
 
-                } else if (gridValues[i][j] == lastValue) {
+                } else if (state.getBoard()[i][j] == lastValue) {
+                    //Moves game board
                     if (move) {
                         setTile(x, y, (lastValue * 2));
                         removeTile(i, j);
                     }
-                    score += lastValue * 2;
+                    state.setTile(x,y,(lastValue * 2));
+                    state.removeTile(i, j);
+                    state.addToScore(lastValue * 2);
+                    state.setEmptyTiles(state.getEmptyTiles()-1);
                     lastValue = 0;
-                    merged = true;
+                    state.setChanged(true);
                 }
-                if (isEmpty(i, j)) {
+                if (state.getBoard()[i][j] == 0) {
 
                 } else {
-                    lastValue = gridValues[i][j];
+                    lastValue = state.getBoard()[i][j];
                     x = i;
                     y = j;
                 }
             }
         }
-        boolean moved = moveLeft(gridValues, move);
-        if (moved || merged) {
-            return true;
-        }
-        return merged;
+        return moveLeft(state, move);
+
     }
 
-    public boolean mergeTilesRight(int[][] gridValues, int score, boolean move) {
-        boolean merged = false;
+    public GameState mergeTilesRight(GameState state, boolean move) {
         int lastValue;
         int x;
         int y;
@@ -254,138 +252,138 @@ public class Game implements MyListener {
             x = -1;
             y = -1;
             for (int j = height - 1; j > -1; j--) {
-                if (isEmpty(i, j)) {
+                if (state.getBoard()[i][j] == 0) {
 
-                } else if (gridValues[i][j] == lastValue) {
+                } else if (state.getBoard()[i][j] == lastValue) {
+                    //Moves game board
                     if (move) {
                         setTile(x, y, (lastValue * 2));
                         removeTile(i, j);
                     }
-                    score += lastValue * 2;
+                    state.setTile(x,y,(lastValue * 2));
+                    state.removeTile(i,j);
+                    state.addToScore(lastValue * 2);
+                    state.setEmptyTiles(state.getEmptyTiles()-1);
                     lastValue = 0;
-                    merged = false;
+                    state.setChanged(true);
                 }
-                if (isEmpty(i, j)) {
+                if (state.getBoard()[i][j] == 0) {
 
                 } else {
-                    lastValue = gridValues[i][j];
+                    lastValue = state.getBoard()[i][j];
                     x = i;
                     y = j;
                 }
             }
         }
-        boolean moved = moveRight(gridValues, move);
-        if (moved || merged) {
-            return true;
-        }
-
-        return false;
+        return moveRight(state, move);
     }
 
-    public boolean moveLeft(int[][] gridValues, boolean move) {
-        boolean moved = false;
-        for (int i = 0; i < gridValues.length; i++) {
-            Integer[] a = new Integer[gridValues[i].length];
-            for (int j = 0; j < gridValues[i].length; j++) {
-                a[j] = Integer.valueOf(gridValues[i][j]);
+    public GameState moveLeft(GameState state, boolean move) {
+        for (int i = 0; i < state.getBoard().length; i++) {
+            Integer[] rowCopy = new Integer[state.getBoard()[i].length];
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                rowCopy[j] = Integer.valueOf(state.getBoard()[i][j]);
             }
 
-            Arrays.sort(a, new CompareTiles().LEFT);
-            for (int j = 0; j < gridValues[i].length; j++) {
-                if ((int) a[j] != gridValues[i][j]) {
-                    moved = true;
+            Arrays.sort(rowCopy, new CompareTiles().LEFT);
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                if (rowCopy[j] != state.getBoard()[i][j]) {
+                    state.setChanged(true);
                 }
                 if (move) {
-                    setTile(i, j, (int) a[j]);
+                    setTile(i, j, rowCopy[j]);
                 }
+                state.setTile(i,j,rowCopy[j]);
             }
         }
-        return moved;
+        return state;
     }
 
-    public boolean moveRight(int[][] gridValues, boolean move) {
-        boolean moved = false;
-        for (int i = 0; i < gridValues.length; i++) {
-            Integer[] a = new Integer[gridValues[i].length];
-            for (int j = 0; j < gridValues[i].length; j++) {
-                a[j] = Integer.valueOf(gridValues[i][j]);
+    public GameState moveRight(GameState state, boolean move) {
+        for (int i = 0; i < state.getBoard().length; i++) {
+            Integer[] rowCopy = new Integer[state.getBoard()[i].length];
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                rowCopy[j] = Integer.valueOf(state.getBoard()[i][j]);
             }
 
-            Arrays.sort(a, new CompareTiles().RIGHT);
-            for (int j = 0; j < gridValues[i].length; j++) {
-                if ((int) a[j] != gridValues[i][j]) {
-                    moved = true;
+            Arrays.sort(rowCopy, new CompareTiles().RIGHT);
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                if (rowCopy[j] != state.getBoard()[i][j]) {
+                    state.setChanged(true);
                 }
                 if (move) {
-                    setTile(i, j, (int) a[j]);
+                    setTile(i, j, rowCopy[j]);
                 }
+                state.setTile(i,j,rowCopy[j]);
             }
         }
-        return moved;
+        return state;
     }
 
-    public boolean moveUp(int[][] gridValues, boolean move) {
-        boolean moved = false;
-        for (int i = 0; i < gridValues.length; i++) {
-            Integer[] a = new Integer[gridValues[i].length];
-            for (int j = 0; j < gridValues[i].length; j++) {
-                a[j] = Integer.valueOf(gridValues[j][i]);
+    public GameState moveUp(GameState state, boolean move) {
+        for (int i = 0; i < state.getBoard().length; i++) {
+            Integer[] rowCopy = new Integer[state.getBoard()[i].length];
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                rowCopy[j] = Integer.valueOf(state.getBoard()[j][i]);
             }
 
-            Arrays.sort(a, new CompareTiles().UP);
-            for (int j = 0; j < gridValues[i].length; j++) {
-                if ((int) a[j] != gridValues[j][i]) {
-                    moved = true;
+            Arrays.sort(rowCopy, new CompareTiles().UP);
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                if ( rowCopy[j] != state.getBoard()[j][i]) {
+                    state.setChanged(true);
                 }
                 if (move) {
-                    setTile(j, i, (int) a[j]);
+                    setTile(j, i, rowCopy[j]);
                 }
+                state.setTile(j,i,rowCopy[j]);
             }
 
         }
-        return moved;
+        return state;
     }
 
-    public boolean moveDown(int[][] gridValues, boolean move) {
-        boolean moved = false;
-        for (int i = 0; i < gridValues.length; i++) {
-            Integer[] a = new Integer[gridValues[i].length];
-            for (int j = 0; j < gridValues[i].length; j++) {
-                a[j] = Integer.valueOf(gridValues[j][i]);
+    public GameState moveDown(GameState state, boolean move) {
+        for (int i = 0; i < state.getBoard().length; i++) {
+            Integer[] rowCopy = new Integer[state.getBoard()[i].length];
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                rowCopy[j] = Integer.valueOf(state.getBoard()[j][i]);
             }
 
-            Arrays.sort(a, new CompareTiles().DOWN);
-            for (int j = 0; j < gridValues[i].length; j++) {
-                if ((int) a[j] != gridValues[j][i]) {
-                    moved = true;
+            Arrays.sort(rowCopy, new CompareTiles().DOWN);
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                if ( rowCopy[j] != state.getBoard()[j][i]) {
+                    state.setChanged(true);
                 }
                 if (move) {
-                    setTile(j, i, (int) a[j]);
+                    setTile(j, i, rowCopy[j]);
                 }
+                state.setTile(j,i,rowCopy[j]);
             }
         }
-        return moved;
+        return state;
     }
 
     public boolean isGameOver() {
-        if (getEmptyTiles(gridValues).isEmpty()) {
+        if (getEmptyTiles(board).isEmpty()) {
             int[][] copyBoard = copyBoard();
-            if (!mergeTilesDown(copyBoard, getScore(), false)
+            //TODO: FIX THIS
+           /* if (!mergeTilesDown(copyBoard, getScore(), false)
                     && !mergeTilesUp(copyBoard, getScore(), false)
                     && !mergeTilesLeft(copyBoard, getScore(), false)
                     && !mergeTilesRight(copyBoard, getScore(), false)) {
                 return true;
-            }
+            }*/
         }
         return false;
     }
 
     public int[][] copyBoard() {
-        int[][] temp = new int[gridValues.length][];
+        int[][] temp = new int[board.length][];
         for (int i = 0; i < temp.length; i++) {
-            temp[i] = new int[gridValues[i].length];
-            for (int j = 0; j < gridValues[i].length; i++) {
-                temp[i][j] = gridValues[i][j];
+            temp[i] = new int[board[i].length];
+            for (int j = 0; j < board[i].length; i++) {
+                temp[i][j] = board[i][j];
             }
         }
         return temp;
@@ -396,41 +394,50 @@ public class Game implements MyListener {
     }
 
     public boolean isEmpty(int x, int y) {
-        return gridValues[x][y] == 0;
+        return board[x][y] == 0;
     }
 
     public boolean wonGame() {
-        for (int i = 0; i < gridValues.length; i++) {
-            for (int j = 0; j < gridValues[i].length; j++) {
-                if (gridValues[i][j] == GOAL) return true; // Checking for 2048
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] == GOAL) return true; // Checking for 2048
             }
         }
         return false;
     }
 
+    public GameState getGameState(){
+        return new GameState(board,score,false);
+    }
+
     public void movement(int move) {
+        GameState currentState;
         switch (move) {
 
             case UP: // UPs
-                if (mergeTilesUp(gridValues, score, true)) {
+                currentState = mergeTilesUp(getGameState(), true);
+                if(currentState.isChanged()){
                     chooseEmptySpot();
                 }
                 break;
 
             case DOWN: // DOWN
-                if (mergeTilesDown(gridValues, score, true)) {
+                currentState = mergeTilesDown(getGameState(), true);
+                if(currentState.isChanged()){
                     chooseEmptySpot();
                 }
                 break;
 
             case LEFT: // LEFT;
-                if (mergeTilesLeft(gridValues, score, true)) {
+                currentState = mergeTilesLeft(getGameState(), true);
+                if(currentState.isChanged()){
                     chooseEmptySpot();
                 }
                 break;
 
             case RIGHT: // RIGHT
-                if (mergeTilesRight(gridValues, score, true)) {
+                currentState = mergeTilesRight(getGameState(), true);
+                if(currentState.isChanged()){
                     chooseEmptySpot();
                 }
                 break;

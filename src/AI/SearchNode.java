@@ -3,6 +3,7 @@ package AI;
 import Game.CompareTiles;
 
 import java.util.ArrayList;
+import Game.GameState;
 import java.util.Arrays;
 
 /**
@@ -12,9 +13,8 @@ import java.util.Arrays;
 
 public class SearchNode {
 
-    private int emptySize;
-    private int nodeValue;
-    private int[][] state;
+   // private int[][] state;
+    private GameState state;
     private int movement;
     private double[][] weightMatrix1;
     private double[][] weightMatrix2;
@@ -25,15 +25,16 @@ public class SearchNode {
 
 
     public SearchNode(int score, ArrayList emptycells, int[][] gridVal) {
-        this.emptySize = emptycells.size();
-        this.nodeValue = score;
-        this.state = new int[gridVal.length][];
+
+        int[][] board = new int[gridVal.length][];
         for (int i = 0; i < gridVal.length; i++) {
-            this.state[i] = new int[gridVal[i].length];
+            board[i] = new int[gridVal[i].length];
             for (int j = 0; j < gridVal[i].length; j++) {
-                this.state[i][j] = gridVal[i][j];
+                board[i][j] = gridVal[i][j];
             }
         }
+        this.state = new GameState(board,score,false, emptycells.size());
+        this.state.setEmptyTiles(emptycells.size());
         this.parent = null;
         weightMatrix1 = new double[4][4];
         /*weightMatrix1[0][0] = 0.135759;
@@ -83,16 +84,9 @@ public class SearchNode {
 
     public SearchNode(SearchNode copy, int movement) {
         this.movement = movement;
-        this.emptySize = copy.emptySize;
-        this.nodeValue = copy.nodeValue;
 
-        this.state = new int[copy.state.length][];
-        for (int i = 0; i < copy.state.length; i++) {
-            this.state[i] = new int[copy.state[i].length];
-            for (int j = 0; j < copy.state[i].length; j++) {
-                this.state[i][j] = copy.state[i][j];
-            }
-        }
+        this.state = copy.state.clone();
+
         this.weightMatrix1 = copy.weightMatrix1;
         this.weightMatrix2 = copy.weightMatrix2;
         this.weightMatrix3 = copy.weightMatrix3;
@@ -100,11 +94,10 @@ public class SearchNode {
         this.parent = copy;
     }
 
-    public SearchNode(SearchNode copy, int[][] state) {
+    public SearchNode(SearchNode copy) {
         this.movement = copy.movement;
-        this.emptySize = copy.emptySize - 1;
-        this.nodeValue = copy.nodeValue;
-        this.state = state;
+        this.state = copy.state.clone();
+
         this.weightMatrix1 = copy.weightMatrix1;
         this.weightMatrix2 = copy.weightMatrix2;
         this.weightMatrix3 = copy.weightMatrix3;
@@ -113,7 +106,7 @@ public class SearchNode {
     }
 
     public int getScore() {
-        return nodeValue;
+        return state.getScore();
     }
 
     public double[][] rotateArray(double[][] array) {
@@ -129,15 +122,21 @@ public class SearchNode {
     }
 
 
+    public void setState(GameState newState){
+        this.state = newState;
+    }
+
+
+
     //https://github.com/datumbox/Game-2048-AI-Solver/blob/master/src/com/datumbox/opensource/ai/AIsolver.java
     private int getClusteringScore() {
         int clusteringScore = 0;
 
         int[] neighbors = {-1, 0, 1};
 
-        for (int i = 0; i < state.length; ++i) {
-            for (int j = 0; j < state.length; ++j) {
-                if (state[i][j] == 0) {
+        for (int i = 0; i < state.getBoard().length; ++i) {
+            for (int j = 0; j < state.getBoard().length; ++j) {
+                if (state.getBoard()[i][j] == 0) {
                     continue; //ignore empty cells
                 }
 
@@ -148,18 +147,18 @@ public class SearchNode {
                 int sum = 0;
                 for (int k : neighbors) {
                     int x = i + k;
-                    if (x < 0 || x >= state.length) {
+                    if (x < 0 || x >= state.getBoard().length) {
                         continue;
                     }
                     for (int l : neighbors) {
                         int y = j + l;
-                        if (y < 0 || y >= state.length) {
+                        if (y < 0 || y >= state.getBoard().length) {
                             continue;
                         }
 
-                        if (state[x][y] > 0) {
+                        if (state.getBoard()[x][y] > 0) {
                             ++numOfNeighbors;
-                            sum += Math.abs(state[i][j] - state[x][y]);
+                            sum += Math.abs(state.getBoard()[i][j] - state.getBoard()[x][y]);
                         }
 
                     }
@@ -178,28 +177,27 @@ public class SearchNode {
     }*/
 
     public double getHeuristicScore() {
-        double sum = getHeuristicScore1()+(emptySize*10)-getClusteringScore() + (nodeValue*2);
-        double newHeuristicScore = getHeuristicScore2()+(emptySize*10)-getClusteringScore() + (nodeValue*2);
+        double sum = getHeuristicScore1()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
+        double newHeuristicScore = getHeuristicScore2()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
         }
-        newHeuristicScore = getHeuristicScore3()+(emptySize*10)-getClusteringScore() + (nodeValue*2);
+        newHeuristicScore = getHeuristicScore3()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
         }
-        newHeuristicScore = getHeuristicScore4()+(emptySize*10)-getClusteringScore() + (nodeValue*2);
+        newHeuristicScore = getHeuristicScore4()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
         }
-
         return sum;
     }
 
     public double getHeuristicScore1() {
         double sum = 0;
-        for (int i = 0; i < state.length; i++) {
-            for (int j = 0; j < state[i].length; j++) {
-                sum += (state[i][j] * weightMatrix1[i][j]) * 100;
+        for (int i = 0; i < state.getBoard().length; i++) {
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                sum += (state.getBoard()[i][j] * weightMatrix1[i][j]) * 100;
             }
         }
         //sum += emptySize - getClusteringScore()*2;
@@ -208,9 +206,9 @@ public class SearchNode {
 
     public double getHeuristicScore2() {
         double sum = 0;
-        for (int i = 0; i < state.length; i++) {
-            for (int j = 0; j < state[i].length; j++) {
-                sum += (state[i][j] * weightMatrix2[i][j]) * 100;
+        for (int i = 0; i < state.getBoard().length; i++) {
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                sum += (state.getBoard()[i][j] * weightMatrix2[i][j]) * 100;
             }
         }
         //sum += emptySize - getClusteringScore()*2;
@@ -219,9 +217,9 @@ public class SearchNode {
 
     public double getHeuristicScore3() {
         double sum = 0;
-        for (int i = 0; i < state.length; i++) {
-            for (int j = 0; j < state[i].length; j++) {
-                sum += (state[i][j] * weightMatrix3[i][j]) * 100;
+        for (int i = 0; i < state.getBoard().length; i++) {
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                sum += (state.getBoard()[i][j] * weightMatrix3[i][j]) * 100;
             }
         }
         //sum += emptySize - getClusteringScore()*2;
@@ -230,9 +228,9 @@ public class SearchNode {
 
     public double getHeuristicScore4() {
         double sum = 0;
-        for (int i = 0; i < state.length; i++) {
-            for (int j = 0; j < state[i].length; j++) {
-                sum += (state[i][j] * weightMatrix4[i][j]) * 100;
+        for (int i = 0; i < state.getBoard().length; i++) {
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                sum += (state.getBoard()[i][j] * weightMatrix4[i][j]) * 100;
             }
         }
         //sum += emptySize - getClusteringScore()*2;
@@ -240,7 +238,7 @@ public class SearchNode {
     }
 
     public int[][] getGridValues() {
-        return state;
+        return state.getBoard();
     }
 
     public SearchNode getParent() {
@@ -251,264 +249,33 @@ public class SearchNode {
         return movement;
     }
 
-    public boolean mergeTilesUp() {
-        boolean merged = false;
-        int lastValue;
-        int x;
-        int y;
-        for (int i = 0; i < state.length; i++) {
-            lastValue = -1;
-            x = -1;
-            y = -1;
-            for (int j = 0; j < state[i].length; j++) {
-                if (state[j][i] == 0) {
-
-                } else if (state[j][i] == lastValue) {
-
-                    setTile(x, y, (lastValue * 2));
-                    state[j][i] = 0;
-
-                    nodeValue += lastValue * 2;
-                    lastValue = 0;
-                    merged = true;
-
-                }
-                if (state[j][i] == 0) {
-
-                } else {
-                    lastValue = state[j][i];
-                    x = j;
-                    y = i;
-                }
-            }
-        }
-        boolean moved = moveUp();
-        if (moved || merged) {
-            return true;
-        }
-        return merged;
+    public GameState getState(){
+        return state;
     }
 
-    public boolean mergeTilesDown() {
-        boolean merged = false;
-        int lastValue = -1;
-        int x;
-        int y;
-        for (int i = 0; i < state.length; i++) {
-            lastValue = -1;
-            x = -1;
-            y = -1;
-            for (int j = state[i].length - 1; j > -1; j--) {
-                if (state[j][i] == 0) {
-
-                } else if (state[j][i] == lastValue) {
-
-                    setTile(x, y, (lastValue * 2));
-                    state[j][i] = 0;
-
-                    nodeValue += lastValue * 2;
-                    lastValue = 0;
-                    merged = true;
-                }
-                if (state[j][i] == 0) {
-
-                } else {
-                    lastValue = state[j][i];
-                    x = j;
-                    y = i;
-                }
-            }
-        }
-        boolean moved = moveDown();
-        if (moved || merged) {
-            return true;
-        }
-        return merged;
-    }
-
-    public boolean mergeTilesLeft() {
-        boolean merged = false;
-        int lastValue;
-        int x;
-        int y;
-        for (int i = 0; i < state.length; i++) {
-            lastValue = -1;
-            x = -1;
-            y = -1;
-            for (int j = 0; j < state[i].length; j++) {
-                if (state[i][j] == 0) {
-
-                } else if (state[i][j] == lastValue) {
-
-                    setTile(x, y, (lastValue * 2));
-                    state[i][j] = 0;
-
-                    nodeValue += lastValue * 2;
-                    lastValue = 0;
-                    merged = true;
-                }
-                if (state[i][j] == 0) {
-
-                } else {
-                    lastValue = state[i][j];
-                    x = i;
-                    y = j;
-                }
-            }
-        }
-        boolean moved = moveLeft();
-        if (moved || merged) {
-            return true;
-        }
-        return merged;
-    }
-
-    public boolean mergeTilesRight() {
-        boolean merged = false;
-        int lastValue;
-        int x;
-        int y;
-        for (int i = 0; i < state.length; i++) {
-            lastValue = -1;
-            x = -1;
-            y = -1;
-            for (int j = state[i].length - 1; j > -1; j--) {
-                if (state[i][j] == 0) {
-
-                } else if (state[i][j] == lastValue) {
-
-                    setTile(x, y, (lastValue * 2));
-                    state[i][j] = 0;
-
-                    nodeValue += lastValue * 2;
-                    lastValue = 0;
-                    merged = false;
-                }
-                if (state[i][j] == 0) {
-
-                } else {
-                    lastValue = state[i][j];
-                    x = i;
-                    y = j;
-                }
-            }
-        }
-        boolean moved = moveRight();
-        if (moved || merged) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean moveLeft() {
-        boolean moved = false;
-        for (int i = 0; i < state.length; i++) {
-            Integer[] a = new Integer[state[i].length];
-            for (int j = 0; j < state[i].length; j++) {
-                a[j] = Integer.valueOf(state[i][j]);
-            }
-
-            Arrays.sort(a, new CompareTiles().LEFT);
-            for (int j = 0; j < state[i].length; j++) {
-                if ((int) a[j] != state[i][j]) {
-                    moved = true;
-                }
-
-                setTile(i, j, (int) a[j]);
-
-            }
-        }
-        return moved;
-    }
-
-    public boolean moveRight() {
-        boolean moved = false;
-        for (int i = 0; i < state.length; i++) {
-            Integer[] a = new Integer[state[i].length];
-            for (int j = 0; j < state[i].length; j++) {
-                a[j] = Integer.valueOf(state[i][j]);
-            }
-
-            Arrays.sort(a, new CompareTiles().RIGHT);
-            for (int j = 0; j < state[i].length; j++) {
-                if ((int) a[j] != state[i][j]) {
-                    moved = true;
-                }
-
-                setTile(i, j, (int) a[j]);
-
-            }
-        }
-        return moved;
-    }
-
-    public boolean moveUp() {
-        boolean moved = false;
-        for (int i = 0; i < state.length; i++) {
-            Integer[] a = new Integer[state[i].length];
-            for (int j = 0; j < state[i].length; j++) {
-                a[j] = Integer.valueOf(state[j][i]);
-            }
-
-            Arrays.sort(a, new CompareTiles().UP);
-            for (int j = 0; j < state[i].length; j++) {
-                if ((int) a[j] != state[j][i]) {
-                    moved = true;
-                }
-
-                setTile(j, i, (int) a[j]);
-
-            }
-
-        }
-        return moved;
-    }
-
-    public boolean moveDown() {
-        boolean moved = false;
-        for (int i = 0; i < state.length; i++) {
-            Integer[] a = new Integer[state[i].length];
-            for (int j = 0; j < state[i].length; j++) {
-                a[j] = Integer.valueOf(state[j][i]);
-            }
-
-            Arrays.sort(a, new CompareTiles().DOWN);
-            for (int j = 0; j < state[i].length; j++) {
-                if ((int) a[j] != state[j][i]) {
-                    moved = true;
-                }
-
-                setTile(j, i, (int) a[j]);
-
-            }
-        }
-        return moved;
-    }
-
-    public void setTile(int x, int y, int number) {
-        state[x][y] = number; // setting number to grid
+    public void setBoard(int[][] newBoard){
+        state.setBoard(newBoard);
     }
 
     public boolean isGameOver() {
-        if (emptySize == 0) {
-
-            if (!mergeTilesDown()
+        if (state.getEmptyTiles() == 0) {
+            //TODO: FIX THIS
+           /* if (!mergeTilesDown()
                     && !mergeTilesUp()
                     && !mergeTilesLeft()
                     && !mergeTilesRight()) {
                 return true;
-            }
+            }*/
         }
         return false;
     }
 
     public String toString() {
-        String ret = "emptySize : " + emptySize + " nodeValue : " + nodeValue + " movement: " + movement;
-        for (int i = 0; i < state.length; i++) {
+        String ret = "emptySize : " + state.getEmptyTiles() + " nodeValue : " + state.getScore() + " movement: " + movement;
+        for (int i = 0; i < state.getBoard().length; i++) {
             ret += "\n|";
-            for (int j = 0; j < state[i].length; j++) {
-                ret += " " + state[i][j] + " |";
+            for (int j = 0; j < state.getBoard()[i].length; j++) {
+                ret += " " + state.getBoard()[i][j] + " |";
             }
         }
         return ret;
