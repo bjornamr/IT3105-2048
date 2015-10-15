@@ -19,16 +19,7 @@ public class SearchNode {
     private double[][] weightMatrix;
     private SearchNode parent;
 
-    public String toString(){
-        String ret = "emptySize : " + emptySize + " nodeValue : " + nodeValue + " movement: " + movement;
-        for(int i = 0;i<state.length;i++){
-            ret+="\n|";
-            for(int j = 0 ;j<state[i].length;j++){
-                ret+=" " + state[i][j] + " |";
-            }
-        }
-        return ret;
-    }
+
 
     public SearchNode(int score, ArrayList emptycells, int[][] gridVal) {
         this.emptySize = emptycells.size();
@@ -140,6 +131,7 @@ public class SearchNode {
 
     public int getHeuristicScore() {
         int score = (int) (nodeValue + Math.log(nodeValue) * emptySize - getClusteringScore());
+        System.out.println(score);
         return Math.max(score, Math.min(nodeValue, 1));
     }
 
@@ -392,5 +384,29 @@ public class SearchNode {
 
     public void setTile(int x, int y, int number) {
         state[x][y] = number; // setting number to grid
+    }
+
+    public boolean isGameOver() {
+        if (emptySize==0) {
+
+            if (!mergeTilesDown()
+                    && !mergeTilesUp()
+                    && !mergeTilesLeft()
+                    && !mergeTilesRight()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String toString(){
+        String ret = "emptySize : " + emptySize + " nodeValue : " + nodeValue + " movement: " + movement;
+        for(int i = 0;i<state.length;i++){
+            ret+="\n|";
+            for(int j = 0 ;j<state[i].length;j++){
+                ret+=" " + state[i][j] + " |";
+            }
+        }
+        return ret;
     }
 }

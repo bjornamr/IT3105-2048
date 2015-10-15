@@ -37,7 +37,7 @@ public class MinMax {
     }
 
     public int minMax(SearchNode node, int depth, boolean maximizing){
-        if( depth ==0){
+        if( depth ==0 || new SearchNode(node, 0).isGameOver()){
             return node.getHeuristicScore();
         }
         if (maximizing){
