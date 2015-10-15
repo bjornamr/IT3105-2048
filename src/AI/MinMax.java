@@ -36,14 +36,14 @@ public class MinMax {
         }
     }
 
-    public int minMax(SearchNode node, int depth, boolean maximizing){
+    public double minMax(SearchNode node, int depth, boolean maximizing){
         if( depth ==0 || new SearchNode(node, 0).isGameOver()){
             return node.getHeuristicScore();
         }
         if (maximizing){
-            int bestValue = -999999999;
+            double bestValue = -999999999;
             for(SearchNode child: getMaxChildren(node)) {
-                int nodeValue = minMax(child, depth-1, false);
+                double nodeValue = minMax(child, depth-1, false);
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
                 if(bestValue<nodeValue){
                     bestValue = nodeValue;
@@ -53,9 +53,9 @@ public class MinMax {
             }
             return bestValue;
         }else{
-            int bestValue = 999999999;
+            double bestValue = 999999999;
             for(SearchNode child: getMinChildren(node)){
-                int nodeValue = minMax(child, depth-1, true);
+                double nodeValue = minMax(child, depth-1, true);
                // bestValue = Math.min(bestValue, minMax(child,depth-1,true));
                 if(bestValue>nodeValue){
                     bestValue = nodeValue;

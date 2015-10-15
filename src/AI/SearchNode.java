@@ -16,9 +16,12 @@ public class SearchNode {
     private int nodeValue;
     private int[][] state;
     private int movement;
-    private double[][] weightMatrix;
-    private SearchNode parent;
+    private double[][] weightMatrix1;
+    private double[][] weightMatrix2;
+    private double[][] weightMatrix3;
+    private double[][] weightMatrix4;
 
+    private SearchNode parent;
 
 
     public SearchNode(int score, ArrayList emptycells, int[][] gridVal) {
@@ -32,28 +35,50 @@ public class SearchNode {
             }
         }
         this.parent = null;
-        weightMatrix = new double[4][4];
-        weightMatrix[0][0] = 0.135759;
-        weightMatrix[0][1] = 0.121925;
-        weightMatrix[0][2] = 0.102812;
-        weightMatrix[0][3] = 0.099937;
+        weightMatrix1 = new double[4][4];
+        /*weightMatrix1[0][0] = 0.135759;
+        weightMatrix1[0][1] = 0.121925;
+        weightMatrix1[0][2] = 0.102812;
+        weightMatrix1[0][3] = 0.099937;
 
-        weightMatrix[1][0] = 0.0997992;
-        weightMatrix[1][1] = 0.0888405;
-        weightMatrix[1][2] = 0.076711;
-        weightMatrix[1][3] = 0.0724143;
+        weightMatrix1[1][0] = 0.0997992;
+        weightMatrix1[1][1] = 0.0888405;
+        weightMatrix1[1][2] = 0.076711;
+        weightMatrix1[1][3] = 0.0724143;
 
-        weightMatrix[2][0] = 0.060654;
-        weightMatrix[2][1] = 0.0562579;
-        weightMatrix[2][2] = 0.037116;
-        weightMatrix[2][3] = 0.0161889;
+        weightMatrix1[2][0] = 0.060654;
+        weightMatrix1[2][1] = 0.0562579;
+        weightMatrix1[2][2] = 0.037116;
+        weightMatrix1[2][3] = 0.0161889;
 
-        weightMatrix[3][0] = 0.0125498;
-        weightMatrix[3][1] = 0.00992495;
-        weightMatrix[3][2] = 0.00575871;
-        weightMatrix[3][3] = 0.00335193;
+        weightMatrix1[3][0] = 0.0125498;
+        weightMatrix1[3][1] = 0.00992495;
+        weightMatrix1[3][2] = 0.00575871;
+        weightMatrix1[3][3] = 0.00335193;*/
+        weightMatrix1[0][0] = 10;
+        weightMatrix1[0][1] = 9;
+        weightMatrix1[0][2] = 8;
+        weightMatrix1[0][3] = 7;
+
+        weightMatrix1[1][0] = 9;
+        weightMatrix1[1][1] = 8;
+        weightMatrix1[1][2] = 7;
+        weightMatrix1[1][3] = 6;
+
+        weightMatrix1[2][0] = 8;
+        weightMatrix1[2][1] = 7;
+        weightMatrix1[2][2] = 6;
+        weightMatrix1[2][3] = 5;
+
+        weightMatrix1[3][0] = 7;
+        weightMatrix1[3][1] = 6;
+        weightMatrix1[3][2] = 5;
+        weightMatrix1[3][3] = 4;
 
 
+        weightMatrix2 = rotateArray(weightMatrix1);
+        weightMatrix3 = rotateArray(weightMatrix2);
+        weightMatrix4 = rotateArray(weightMatrix3);
     }
 
     public SearchNode(SearchNode copy, int movement) {
@@ -68,7 +93,10 @@ public class SearchNode {
                 this.state[i][j] = copy.state[i][j];
             }
         }
-        this.weightMatrix = copy.weightMatrix;
+        this.weightMatrix1 = copy.weightMatrix1;
+        this.weightMatrix2 = copy.weightMatrix2;
+        this.weightMatrix3 = copy.weightMatrix3;
+        this.weightMatrix4 = copy.weightMatrix4;
         this.parent = copy;
     }
 
@@ -77,12 +105,27 @@ public class SearchNode {
         this.emptySize = copy.emptySize - 1;
         this.nodeValue = copy.nodeValue;
         this.state = state;
-        this.weightMatrix = copy.weightMatrix;
+        this.weightMatrix1 = copy.weightMatrix1;
+        this.weightMatrix2 = copy.weightMatrix2;
+        this.weightMatrix3 = copy.weightMatrix3;
+        this.weightMatrix4 = copy.weightMatrix4;
         this.parent = copy;
     }
 
     public int getScore() {
         return nodeValue;
+    }
+
+    public double[][] rotateArray(double[][] array) {
+        int M = array.length;
+        int N = array[0].length;
+        double[][] temp = new double[M][N];
+        for (int i = 0; i < array[0].length; i++) {
+            for (int j = 0; j < M; j++) {
+                temp[j][M - 1 - i] = array[i][j];
+            }
+        }
+        return temp;
     }
 
 
@@ -125,14 +168,75 @@ public class SearchNode {
                 clusteringScore += sum / numOfNeighbors;
             }
         }
-
         return clusteringScore;
     }
 
-    public int getHeuristicScore() {
+   /* public int getHeuristicScore() {
         int score = (int) (nodeValue + Math.log(nodeValue) * emptySize - getClusteringScore());
         System.out.println(score);
         return Math.max(score, Math.min(nodeValue, 1));
+    }*/
+
+    public double getHeuristicScore() {
+        double sum = getHeuristicScore1()+(emptySize*10)-getClusteringScore() + (nodeValue*2);
+        double newHeuristicScore = getHeuristicScore2()+(emptySize*10)-getClusteringScore() + (nodeValue*2);
+        if (newHeuristicScore > sum) {
+            sum = newHeuristicScore;
+        }
+        newHeuristicScore = getHeuristicScore3()+(emptySize*10)-getClusteringScore() + (nodeValue*2);
+        if (newHeuristicScore > sum) {
+            sum = newHeuristicScore;
+        }
+        newHeuristicScore = getHeuristicScore4()+(emptySize*10)-getClusteringScore() + (nodeValue*2);
+        if (newHeuristicScore > sum) {
+            sum = newHeuristicScore;
+        }
+
+        return sum;
+    }
+
+    public double getHeuristicScore1() {
+        double sum = 0;
+        for (int i = 0; i < state.length; i++) {
+            for (int j = 0; j < state[i].length; j++) {
+                sum += (state[i][j] * weightMatrix1[i][j]) * 100;
+            }
+        }
+        //sum += emptySize - getClusteringScore()*2;
+        return sum;
+    }
+
+    public double getHeuristicScore2() {
+        double sum = 0;
+        for (int i = 0; i < state.length; i++) {
+            for (int j = 0; j < state[i].length; j++) {
+                sum += (state[i][j] * weightMatrix2[i][j]) * 100;
+            }
+        }
+        //sum += emptySize - getClusteringScore()*2;
+        return sum;
+    }
+
+    public double getHeuristicScore3() {
+        double sum = 0;
+        for (int i = 0; i < state.length; i++) {
+            for (int j = 0; j < state[i].length; j++) {
+                sum += (state[i][j] * weightMatrix3[i][j]) * 100;
+            }
+        }
+        //sum += emptySize - getClusteringScore()*2;
+        return sum;
+    }
+
+    public double getHeuristicScore4() {
+        double sum = 0;
+        for (int i = 0; i < state.length; i++) {
+            for (int j = 0; j < state[i].length; j++) {
+                sum += (state[i][j] * weightMatrix4[i][j]) * 100;
+            }
+        }
+        //sum += emptySize - getClusteringScore()*2;
+        return sum;
     }
 
     public int[][] getGridValues() {
@@ -387,7 +491,7 @@ public class SearchNode {
     }
 
     public boolean isGameOver() {
-        if (emptySize==0) {
+        if (emptySize == 0) {
 
             if (!mergeTilesDown()
                     && !mergeTilesUp()
@@ -399,12 +503,12 @@ public class SearchNode {
         return false;
     }
 
-    public String toString(){
+    public String toString() {
         String ret = "emptySize : " + emptySize + " nodeValue : " + nodeValue + " movement: " + movement;
-        for(int i = 0;i<state.length;i++){
-            ret+="\n|";
-            for(int j = 0 ;j<state[i].length;j++){
-                ret+=" " + state[i][j] + " |";
+        for (int i = 0; i < state.length; i++) {
+            ret += "\n|";
+            for (int j = 0; j < state[i].length; j++) {
+                ret += " " + state[i][j] + " |";
             }
         }
         return ret;

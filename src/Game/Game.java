@@ -335,7 +335,6 @@ public class Game implements MyListener {
             Arrays.sort(a, new CompareTiles().UP);
             for (int j = 0; j < gridValues[i].length; j++) {
                 if ((int) a[j] != gridValues[j][i]) {
-                    System.out.println("TRUE");
                     moved = true;
                 }
                 if (move) {
