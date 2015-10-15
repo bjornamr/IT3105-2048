@@ -19,24 +19,25 @@ public class MinMax {
     }
 
     public void start(SearchNode startNode, int depth){
+        SearchNode currentNode = startNode;
         while(true) {
             try{
-                Thread.sleep(100);
+               // Thread.sleep(100);
             }catch (Exception e){
 
             }
-            minMax(startNode, depth, true);
+            minMax(currentNode, depth, true);
             while(currentBestValue.getParent().getParent() != null){
                 currentBestValue = currentBestValue.getParent();
             }
             //System.out.println("Current movement: " + currentBestValue.getMovement());
             game.movement(currentBestValue.getMovement());
+            currentNode = new SearchNode(game.getScore(), game.getEmptyTiles(game.getgridValues()),game.getgridValues());
         }
     }
 
     public int minMax(SearchNode node, int depth, boolean maximizing){
         if( depth ==0){
-            //System.out.println("heuristic value: " + node.getHeuristicScore());
             return node.getHeuristicScore();
         }
         if (maximizing){
@@ -71,31 +72,22 @@ public class MinMax {
     public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
         ArrayList<SearchNode> returnArray = new ArrayList();// {new SearchNode(parent, SearchNode.LEFT),new SearchNode(parent,SearchNode.RIGHT), new SearchNode(parent,SearchNode.UP),new SearchNode(parent,SearchNode.DOWN)};
         SearchNode temp = new SearchNode(parent, Game.LEFT);
-        System.out.println("score1 : " + temp.getScore());
-        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore(), false)){ // CHECK this? Does it need to be individual ints for temp.getscore?
+        if(temp.mergeTilesLeft()){ // CHECK this? Does it need to be individual ints for temp.getscore?
             returnArray.add(temp);
-            System.out.println("score2 : " + temp.getScore());
         }
         temp = new SearchNode(parent, Game.RIGHT);
-        System.out.println("score1 : " + temp.getScore());
-        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore(), false)){
+        if(temp.mergeTilesRight()){
             returnArray.add(temp);
-            System.out.println("score2 : " + temp.getScore());
         }
 
         temp = new SearchNode(parent, Game.UP);
-        System.out.println("score1 : " + temp.getScore());
-        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore(), false)){
+        if(temp.mergeTilesUp()) {
             returnArray.add(temp);
-            System.out.println("score2 : " + temp.getScore());
         }
         temp = new SearchNode(parent, Game.DOWN);
-        System.out.println("score1 : " + temp.getScore());
-        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore(), false)){
+        if (temp.mergeTilesDown()) {
             returnArray.add(temp);
-            System.out.println("score2 : " + temp.getScore());
         }
-
         return returnArray;
 
     }

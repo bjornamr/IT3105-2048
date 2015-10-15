@@ -1,11 +1,13 @@
 package AI;
 
+import Game.CompareTiles;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Bjornars on 13.10.2015.
  */
-
 
 
 public class SearchNode {
@@ -17,14 +19,24 @@ public class SearchNode {
     private double[][] weightMatrix;
     private SearchNode parent;
 
+    public String toString(){
+        String ret = "emptySize : " + emptySize + " nodeValue : " + nodeValue + " movement: " + movement;
+        for(int i = 0;i<state.length;i++){
+            ret+="\n|";
+            for(int j = 0 ;j<state[i].length;j++){
+                ret+=" " + state[i][j] + " |";
+            }
+        }
+        return ret;
+    }
 
-    public SearchNode(int score,ArrayList emptycells,int[][] gridVal){
+    public SearchNode(int score, ArrayList emptycells, int[][] gridVal) {
         this.emptySize = emptycells.size();
         this.nodeValue = score;
         this.state = new int[gridVal.length][];
-        for (int i =0; i<gridVal.length; i++){
+        for (int i = 0; i < gridVal.length; i++) {
             this.state[i] = new int[gridVal[i].length];
-            for(int j=0; j<gridVal[i].length; j++){
+            for (int j = 0; j < gridVal[i].length; j++) {
                 this.state[i][j] = gridVal[i][j];
             }
         }
@@ -52,15 +64,16 @@ public class SearchNode {
 
 
     }
-    public SearchNode(SearchNode copy, int movement){
+
+    public SearchNode(SearchNode copy, int movement) {
         this.movement = movement;
         this.emptySize = copy.emptySize;
         this.nodeValue = copy.nodeValue;
 
         this.state = new int[copy.state.length][];
-        for (int i =0; i<copy.state.length; i++){
+        for (int i = 0; i < copy.state.length; i++) {
             this.state[i] = new int[copy.state[i].length];
-            for(int j=0; j<copy.state[i].length; j++){
+            for (int j = 0; j < copy.state[i].length; j++) {
                 this.state[i][j] = copy.state[i][j];
             }
         }
@@ -68,57 +81,57 @@ public class SearchNode {
         this.parent = copy;
     }
 
-    public SearchNode(SearchNode copy, int[][] state){
+    public SearchNode(SearchNode copy, int[][] state) {
         this.movement = copy.movement;
-        this.emptySize = copy.emptySize-1;
+        this.emptySize = copy.emptySize - 1;
         this.nodeValue = copy.nodeValue;
         this.state = state;
         this.weightMatrix = copy.weightMatrix;
         this.parent = copy;
     }
 
-    public int getScore(){
+    public int getScore() {
         return nodeValue;
     }
 
 
     //https://github.com/datumbox/Game-2048-AI-Solver/blob/master/src/com/datumbox/opensource/ai/AIsolver.java
     private int getClusteringScore() {
-        int clusteringScore=0;
+        int clusteringScore = 0;
 
-        int[] neighbors = {-1,0,1};
+        int[] neighbors = {-1, 0, 1};
 
-        for(int i=0;i<state.length;++i) {
-            for(int j=0;j<state.length;++j) {
-                if(state[i][j]==0) {
+        for (int i = 0; i < state.length; ++i) {
+            for (int j = 0; j < state.length; ++j) {
+                if (state[i][j] == 0) {
                     continue; //ignore empty cells
                 }
 
                 //clusteringScore-=boardArray[i][j];
 
                 //for every pixel find the distance from each neightbors
-                int numOfNeighbors=0;
-                int sum=0;
-                for(int k : neighbors) {
-                    int x=i+k;
-                    if(x<0 || x>=state.length) {
+                int numOfNeighbors = 0;
+                int sum = 0;
+                for (int k : neighbors) {
+                    int x = i + k;
+                    if (x < 0 || x >= state.length) {
                         continue;
                     }
-                    for(int l : neighbors) {
-                        int y = j+l;
-                        if(y<0 || y>=state.length) {
+                    for (int l : neighbors) {
+                        int y = j + l;
+                        if (y < 0 || y >= state.length) {
                             continue;
                         }
 
-                        if(state[x][y]>0) {
+                        if (state[x][y] > 0) {
                             ++numOfNeighbors;
-                            sum+=Math.abs(state[i][j]-state[x][y]);
+                            sum += Math.abs(state[i][j] - state[x][y]);
                         }
 
                     }
                 }
 
-                clusteringScore+=sum/numOfNeighbors;
+                clusteringScore += sum / numOfNeighbors;
             }
         }
 
@@ -126,19 +139,258 @@ public class SearchNode {
     }
 
     public int getHeuristicScore() {
-        int score = (int) (nodeValue+Math.log(nodeValue)*emptySize -getClusteringScore());
+        int score = (int) (nodeValue + Math.log(nodeValue) * emptySize - getClusteringScore());
         return Math.max(score, Math.min(nodeValue, 1));
     }
 
-    public int[][] getGridValues(){
+    public int[][] getGridValues() {
         return state;
     }
 
-    public SearchNode getParent(){
+    public SearchNode getParent() {
         return parent;
     }
 
-    public int getMovement(){
+    public int getMovement() {
         return movement;
+    }
+
+    public boolean mergeTilesUp() {
+        boolean merged = false;
+        int lastValue;
+        int x;
+        int y;
+        for (int i = 0; i < state.length; i++) {
+            lastValue = -1;
+            x = -1;
+            y = -1;
+            for (int j = 0; j < state[i].length; j++) {
+                if (state[j][i] == 0) {
+
+                } else if (state[j][i] == lastValue) {
+
+                    setTile(x, y, (lastValue * 2));
+                    state[j][i] = 0;
+
+                    nodeValue += lastValue * 2;
+                    lastValue = 0;
+                    merged = true;
+
+                }
+                if (state[j][i] == 0) {
+
+                } else {
+                    lastValue = state[j][i];
+                    x = j;
+                    y = i;
+                }
+            }
+        }
+        boolean moved = moveUp();
+        if (moved || merged) {
+            return true;
+        }
+        return merged;
+    }
+
+    public boolean mergeTilesDown() {
+        boolean merged = false;
+        int lastValue = -1;
+        int x;
+        int y;
+        for (int i = 0; i < state.length; i++) {
+            lastValue = -1;
+            x = -1;
+            y = -1;
+            for (int j = state[i].length - 1; j > -1; j--) {
+                if (state[j][i] == 0) {
+
+                } else if (state[j][i] == lastValue) {
+
+                    setTile(x, y, (lastValue * 2));
+                    state[j][i] = 0;
+
+                    nodeValue += lastValue * 2;
+                    lastValue = 0;
+                    merged = true;
+                }
+                if (state[j][i] == 0) {
+
+                } else {
+                    lastValue = state[j][i];
+                    x = j;
+                    y = i;
+                }
+            }
+        }
+        boolean moved = moveDown();
+        if (moved || merged) {
+            return true;
+        }
+        return merged;
+    }
+
+    public boolean mergeTilesLeft() {
+        boolean merged = false;
+        int lastValue;
+        int x;
+        int y;
+        for (int i = 0; i < state.length; i++) {
+            lastValue = -1;
+            x = -1;
+            y = -1;
+            for (int j = 0; j < state[i].length; j++) {
+                if (state[i][j] == 0) {
+
+                } else if (state[i][j] == lastValue) {
+
+                    setTile(x, y, (lastValue * 2));
+                    state[i][j] = 0;
+
+                    nodeValue += lastValue * 2;
+                    lastValue = 0;
+                    merged = true;
+                }
+                if (state[i][j] == 0) {
+
+                } else {
+                    lastValue = state[i][j];
+                    x = i;
+                    y = j;
+                }
+            }
+        }
+        boolean moved = moveLeft();
+        if (moved || merged) {
+            return true;
+        }
+        return merged;
+    }
+
+    public boolean mergeTilesRight() {
+        boolean merged = false;
+        int lastValue;
+        int x;
+        int y;
+        for (int i = 0; i < state.length; i++) {
+            lastValue = -1;
+            x = -1;
+            y = -1;
+            for (int j = state[i].length - 1; j > -1; j--) {
+                if (state[i][j] == 0) {
+
+                } else if (state[i][j] == lastValue) {
+
+                    setTile(x, y, (lastValue * 2));
+                    state[i][j] = 0;
+
+                    nodeValue += lastValue * 2;
+                    lastValue = 0;
+                    merged = false;
+                }
+                if (state[i][j] == 0) {
+
+                } else {
+                    lastValue = state[i][j];
+                    x = i;
+                    y = j;
+                }
+            }
+        }
+        boolean moved = moveRight();
+        if (moved || merged) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean moveLeft() {
+        boolean moved = false;
+        for (int i = 0; i < state.length; i++) {
+            Integer[] a = new Integer[state[i].length];
+            for (int j = 0; j < state[i].length; j++) {
+                a[j] = Integer.valueOf(state[i][j]);
+            }
+
+            Arrays.sort(a, new CompareTiles().LEFT);
+            for (int j = 0; j < state[i].length; j++) {
+                if ((int) a[j] != state[i][j]) {
+                    moved = true;
+                }
+
+                setTile(i, j, (int) a[j]);
+
+            }
+        }
+        return moved;
+    }
+
+    public boolean moveRight() {
+        boolean moved = false;
+        for (int i = 0; i < state.length; i++) {
+            Integer[] a = new Integer[state[i].length];
+            for (int j = 0; j < state[i].length; j++) {
+                a[j] = Integer.valueOf(state[i][j]);
+            }
+
+            Arrays.sort(a, new CompareTiles().RIGHT);
+            for (int j = 0; j < state[i].length; j++) {
+                if ((int) a[j] != state[i][j]) {
+                    moved = true;
+                }
+
+                setTile(i, j, (int) a[j]);
+
+            }
+        }
+        return moved;
+    }
+
+    public boolean moveUp() {
+        boolean moved = false;
+        for (int i = 0; i < state.length; i++) {
+            Integer[] a = new Integer[state[i].length];
+            for (int j = 0; j < state[i].length; j++) {
+                a[j] = Integer.valueOf(state[j][i]);
+            }
+
+            Arrays.sort(a, new CompareTiles().UP);
+            for (int j = 0; j < state[i].length; j++) {
+                if ((int) a[j] != state[j][i]) {
+                    moved = true;
+                }
+
+                setTile(j, i, (int) a[j]);
+
+            }
+
+        }
+        return moved;
+    }
+
+    public boolean moveDown() {
+        boolean moved = false;
+        for (int i = 0; i < state.length; i++) {
+            Integer[] a = new Integer[state[i].length];
+            for (int j = 0; j < state[i].length; j++) {
+                a[j] = Integer.valueOf(state[j][i]);
+            }
+
+            Arrays.sort(a, new CompareTiles().DOWN);
+            for (int j = 0; j < state[i].length; j++) {
+                if ((int) a[j] != state[j][i]) {
+                    moved = true;
+                }
+
+                setTile(j, i, (int) a[j]);
+
+            }
+        }
+        return moved;
+    }
+
+    public void setTile(int x, int y, int number) {
+        state[x][y] = number; // setting number to grid
     }
 }
