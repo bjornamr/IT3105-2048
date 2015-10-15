@@ -2,6 +2,7 @@ package AI;
 import Game.Game;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 /**
@@ -9,52 +10,92 @@ import java.util.ArrayList;
  */
 
 public class MinMax {
-    Game game;
+    private Game game;
+    private SearchNode currentBestValue;
 
 
+    public MinMax(Game game){
+        this.game = game;
+    }
 
+    public void start(SearchNode startNode, int depth){
+        while(true) {
+            try{
+                Thread.sleep(100);
+            }catch (Exception e){
+
+            }
+            minMax(startNode, depth, true);
+            while(currentBestValue.getParent().getParent() != null){
+                currentBestValue = currentBestValue.getParent();
+            }
+            //System.out.println("Current movement: " + currentBestValue.getMovement());
+            game.movement(currentBestValue.getMovement());
+        }
+    }
 
     public int minMax(SearchNode node, int depth, boolean maximizing){
         if( depth ==0){
+            //System.out.println("heuristic value: " + node.getHeuristicScore());
             return node.getHeuristicScore();
         }
         if (maximizing){
-            int bestValue = 999999999;
+            int bestValue = -999999999;
             for(SearchNode child: getMaxChildren(node)) {
-                bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
-
+                int nodeValue = minMax(child, depth-1, false);
+                //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
+                if(bestValue<nodeValue){
+                    bestValue = nodeValue;
+                    currentBestValue = child;
+                    //System.out.println(bestValue + " " + currentBestValue.getMovement());
+                }
             }
             return bestValue;
         }else{
             int bestValue = 999999999;
-           // for(SearchNode child: getMinChildren(node)){
-            //    bestValue = Math.min(bestValue, minMax(child,depth-1,true));
-
-           // }
+            for(SearchNode child: getMinChildren(node)){
+                int nodeValue = minMax(child, depth-1, true);
+               // bestValue = Math.min(bestValue, minMax(child,depth-1,true));
+                if(bestValue>nodeValue){
+                    bestValue = nodeValue;
+                    currentBestValue = child;
+                   // System.out.println(bestValue + " " + currentBestValue.getMovement());
+                }
+            }
             return bestValue;
         }
 
     }
 
-    // TODO: test if normal array is faster
+    // TODO: test if normal array is faster and check if score is updated
     public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
         ArrayList<SearchNode> returnArray = new ArrayList();// {new SearchNode(parent, SearchNode.LEFT),new SearchNode(parent,SearchNode.RIGHT), new SearchNode(parent,SearchNode.UP),new SearchNode(parent,SearchNode.DOWN)};
-        SearchNode temp = new SearchNode(parent, SearchNode.LEFT);
-        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore())){ // CHECK this? Does it need to be individual ints for temp.getscore?
+        SearchNode temp = new SearchNode(parent, Game.LEFT);
+        System.out.println("score1 : " + temp.getScore());
+        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore(), false)){ // CHECK this? Does it need to be individual ints for temp.getscore?
             returnArray.add(temp);
+            System.out.println("score2 : " + temp.getScore());
         }
-        temp = new SearchNode(parent, SearchNode.RIGHT);
-        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore())){
+        temp = new SearchNode(parent, Game.RIGHT);
+        System.out.println("score1 : " + temp.getScore());
+        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore(), false)){
             returnArray.add(temp);
+            System.out.println("score2 : " + temp.getScore());
         }
-        temp = new SearchNode(parent, SearchNode.UP);
-        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore())){
+
+        temp = new SearchNode(parent, Game.UP);
+        System.out.println("score1 : " + temp.getScore());
+        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore(), false)){
             returnArray.add(temp);
+            System.out.println("score2 : " + temp.getScore());
         }
-        temp = new SearchNode(parent, SearchNode.DOWN);
-        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore())){
+        temp = new SearchNode(parent, Game.DOWN);
+        System.out.println("score1 : " + temp.getScore());
+        if(game.mergeTilesLeft(temp.getGridValues(),temp.getScore(), false)){
             returnArray.add(temp);
+            System.out.println("score2 : " + temp.getScore());
         }
+
         return returnArray;
 
     }
@@ -69,9 +110,11 @@ public class MinMax {
         if(empty.size() >0) {
             for (int i = 0; i < empty.size(); i++) {
                 int[] xy = game.i1Dto2D((int) empty.get(i));
-                int[][] newArray = new int[gridval.length][gridval[0].length]; // fix 0? not fixed size?
-                int[][] newArray2 = new int[gridval.length][gridval[0].length];
+                int[][] newArray = new int[gridval.length][]; // fix 0? not fixed size?
+                int[][] newArray2 = new int[gridval.length][];
                 for (int j = 0; j < gridval.length; j++) {
+                    newArray[j] = new int[gridval[j].length];
+                    newArray2[j] = new int[gridval[j].length];
                     for (int k = 0; k < gridval[j].length; k++) {
                         newArray[j][k] = gridval[j][k];
                         newArray2[j][k] = gridval[j][k];
@@ -84,12 +127,12 @@ public class MinMax {
                 /// hardcopy score....
 
 
-                //sn.add(SearchNode(score,empty.size-1,newArray));
-                //sn.add(SearchNode(score2,empty.size-1,newArray2));
+                sn.add(new SearchNode(parent,newArray));
+                sn.add(new SearchNode(parent,newArray2));
             }
         }
 
-        return null;
+        return sn;
 
 
 
