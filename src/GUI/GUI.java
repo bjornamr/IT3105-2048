@@ -53,9 +53,9 @@ public class GUI extends JFrame implements KeyListener {
                return UIManager.getColor("Panel.background");
                 //return Color.LIGHT_GRAY;
             case 2:
-                return new Color(0xeee4da);
+                return new Color(0xEECCAF);
             case 4:
-                return new Color(0xede0c8);
+                return new Color(0xC19D85);
             case 8:
                 return new Color(0xf2b179);
             case 16:

@@ -20,25 +20,36 @@ public class MinMax {
     }
 
     public void start(SearchNode startNode, int depth){
+        int moves = 0;
         SearchNode currentNode = startNode;
         while(true) {
             try{
-               // Thread.sleep(2000);
+                //Thread.sleep(1000);
             }catch (Exception e){
 
             }
 
             //currentBestValue = minMax(currentNode, depth, true).getNode();
-            currentBestValue = alphabeta(currentNode,depth,Integer.MIN_VALUE,Integer.MAX_VALUE,true).getNode();
+            ReturnValue ret = alphabeta(currentNode,depth,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
+            if(ret == null){
+                System.out.println("GAME OVER, total moves: " + moves);
+
+            }
+            currentBestValue = ret.getNode();
             while(currentBestValue.getParent().getParent() != null){
                 currentBestValue = currentBestValue.getParent();
             }
             //System.out.println("Current movement: " + currentBestValue.getMovement());
             game.movement(currentBestValue.getMovement());
+            moves++;
             game.getEmptyTiles(game.getBoardValues()).size();
             currentNode = new SearchNode(game.getScore(), game.getEmptyTiles(game.getBoardValues()), game.getBoardValues());
         }
     }
+
+
+
+
 
     /// Start should be alpha = -inf beta=inf
     public ReturnValue alphabeta(SearchNode node, int depth,double alpha, double beta, boolean maximizing){

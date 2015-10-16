@@ -37,7 +37,7 @@ public class SearchNode {
         this.state.setEmptyTiles(emptycells.size());
         this.parent = null;
         weightMatrix1 = new double[4][4];
-        /*weightMatrix1[0][0] = 0.135759;
+        weightMatrix1[0][0] = 0.135759;
         weightMatrix1[0][1] = 0.121925;
         weightMatrix1[0][2] = 0.102812;
         weightMatrix1[0][3] = 0.099937;
@@ -55,8 +55,8 @@ public class SearchNode {
         weightMatrix1[3][0] = 0.0125498;
         weightMatrix1[3][1] = 0.00992495;
         weightMatrix1[3][2] = 0.00575871;
-        weightMatrix1[3][3] = 0.00335193;*/
-        weightMatrix1[0][0] = 10;
+        weightMatrix1[3][3] = 0.00335193;
+        /*weightMatrix1[0][0] = 10;
         weightMatrix1[0][1] = 9;
         weightMatrix1[0][2] = 8;
         weightMatrix1[0][3] = 7;
@@ -74,7 +74,7 @@ public class SearchNode {
         weightMatrix1[3][0] = 7;
         weightMatrix1[3][1] = 6;
         weightMatrix1[3][2] = 5;
-        weightMatrix1[3][3] = 4;
+        weightMatrix1[3][3] = 4;*/
 
 
         weightMatrix2 = rotateArray(weightMatrix1);
@@ -170,33 +170,285 @@ public class SearchNode {
         return clusteringScore;
     }
 
-    public int getHeuristicScore() {
-        int score = (int) (state.getScore() + Math.log(state.getScore()) * state.getEmptyTiles() - getClusteringScore());
-        return Math.max(score, Math.min(state.getScore(), 1));
+    public double getHeuristicScore() {
+        //System.out.println("mono: " +getMonotonicityHeuristic());
+        //double score = (Math.log(state.getScore()) * state.getEmptyTiles()+getMonotonicity(3))+(getHeuristicWeightScore()*Math.log(state.getScore()))+getSmoothness();
+        double score = getMonotonicity(3)+getSmoothness()+Math.log(state.getScore())*state.getEmptyTiles();
+        System.out.println("MONO: " + getMonotonicity(3) +"\nsmooth: "+ getSmoothness() +"\nScore: "+ state.getScore()*0.5);
+        //double score = (state.getScore() + Math.log(state.getScore())*state.getEmptyTiles()) - getClusteringScore();
+        //System.out.println("MONO: " + getMonotonicity(3));
+        //double score = 2000 + (Math.log(state.getScore())*getHeuristicWeightScore()*state.getEmptyTiles())+(getMonotonicity(3)*3.7) + (heur_score(1.1)*(-1.5)) + (getSmoothness()*3.5);
+        //double score = getMonotonicity(3);
+        //System.out.println((getHeuristicWeightScore()*state.getEmptyTiles())*Math.log(state.getScore()));
+        //System.out.println("SCORE: " + score);
+        //score+= getSmoothness()*0.1;
+        //System.out.println("AFTER: " + score);
+        //score+= getHeuristicWeightScore()*1.6;
+        //System.out.println("SCORE: " + score + "\nMONO: " + getMonotonicity(3));
+        if(Double.isInfinite(score)){
+            score = 0;
+        }
+        return score;
+
+        /*System.out.println("SCORE: " + score);
+        if(isHighestValueInCorner()){
+           score+=state.getScore()/2;
+            System.out.println("AFTER: " + score);
+        }*/
+
+
+        //System.out.println("SCORE: " + score);
+        /*double temp = score+getHeuristicScore1();
+        if(score+getHeuristicScore2()>temp){
+            temp = score+getHeuristicScore2();
+        }
+        if(score+getHeuristicScore3()>temp){
+            temp = score+getHeuristicScore3();
+        }
+        if(score+getHeuristicScore4()>temp){
+            temp = score+getHeuristicScore4();
+        }
+        //System.out.println("TEMP: " + temp);*/
+       // return Math.max(score, Math.min(state.getScore(), 1));
+        //return state.getEmptyTiles()*getMonotocityHeuristic()-getClusteringScore();
     }
 
-   /* public double getHeuristicScore() {
-        double sum = getHeuristicScore1()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
-        double newHeuristicScore = getHeuristicScore2()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
+    public double heur_score(double power){
+        int [] sums = new int[4];
+        double score =0;
+        for(int i =0; i<state.getBoard().length; i++){
+            for(int j=0; j<state.getBoard()[i].length; j++){
+                if(state.getBoard()[i][j] !=0){
+                    sums[i] +=(Math.log(state.getBoard()[i][j])/Math.log(2)) *Math.exp(state.getBoard().length)*Math.exp(state.getBoard().length);
+                }
+            }
+        }
+
+        for(int i =0; i<state.getBoard().length; i++){
+            score+= Math.pow(sums[i],power);
+        }
+        return score;
+    }
+
+    public int getSmoothness(){
+        int smooth = 0;
+        for(int i = 0;i<state.getBoard().length;i++){
+            for(int j = 0;j<state.getBoard()[i].length;j++){
+                int x = i;
+                int y = j;
+                if(isInsideGrid(x-1,y)){
+                    smooth+=Math.abs(state.getBoard()[i][j]-state.getBoard()[x-1][y]);
+                }
+                if(isInsideGrid(x+1,y)){
+                    smooth+=Math.abs(state.getBoard()[i][j]-state.getBoard()[x+1][y]);
+                }
+                if(isInsideGrid(x,y-1)){
+                    smooth+=Math.abs(state.getBoard()[i][j]-state.getBoard()[x][y-1]);
+                }
+                if(isInsideGrid(x,y+1)){
+                    smooth+=Math.abs(state.getBoard()[i][j]-state.getBoard()[x][y+1]);
+                }
+            }
+        }
+        return smooth;
+    }
+
+    public boolean isInsideGrid(int x, int y){
+        if(x>-1 && x<state.getBoard().length && y > -1 && y < state.getBoard()[x].length){
+            return true;
+        }
+        return false;
+    }
+
+    public double getMonotonicity(int power){
+        double[] totals = new double[4];
+
+        for (int x = 0; x < 4; x++) {
+            int current = 0;
+            int next = 1;
+            while (next < 4) {
+                while (next < 4 && state.getBoard()[x][next] ==0) {
+                    next++;
+                }
+                if (next >= 4) {
+                    --next;
+                }
+                int our_cellx = x;
+                int our_celly = current;
+                int next_cellx = x;
+                int next_celly = next;
+                double cur_val =0;
+                if(-1 < our_cellx && our_cellx <state.getBoard().length && -1 < our_celly && our_celly < state.getBoard()[our_cellx].length) {
+
+                    if(state.getBoard()[our_cellx][our_celly]!=0) {
+                        cur_val= Math.log(state.getBoard()[our_cellx][our_celly])/Math.log(2);
+                    }
+                }
+                double next_val =0;
+                if(-1 < next_cellx && next_cellx <state.getBoard().length && -1 < next_celly && next_celly < state.getBoard()[next_celly].length) {
+
+                    if(state.getBoard()[next_cellx][next_celly]!=0) {
+                        next_val=Math.log(state.getBoard()[next_cellx][next_celly])/Math.log(2);
+
+                    }
+                }
+
+                if (cur_val > next_val) {
+                    totals[0] += next_val - cur_val;
+                } else if (next_val > cur_val) {
+                    totals[1] += cur_val - next_val;
+                }
+                current = next;
+                next++;
+            }
+        }
+
+        for (int y = 0; y < 4; y++) {
+            int current = 0;
+            int next = 1;
+            while (next < 4) {
+                while (next < 4 && state.getBoard()[next][y]==0) {
+                    next++;
+                }
+                if (next >= 4) {
+                    --next;
+                }
+                int our_cellx = current;
+                int our_celly= y;
+                int next_cellx = next;
+                int next_celly = y;
+                double cur_val =0;
+                if(-1 < our_cellx && our_cellx <state.getBoard().length && -1 < our_celly && our_celly < state.getBoard()[our_cellx].length) {
+
+                    if(state.getBoard()[our_cellx][our_celly]!=0) {
+                        cur_val= Math.log(state.getBoard()[our_cellx][our_celly])/Math.log(2);
+                    }
+                }
+                double next_val =0;
+                if(-1 < next_cellx && next_cellx <state.getBoard().length && -1 < next_celly && next_celly < state.getBoard()[next_celly].length) {
+
+                    if(state.getBoard()[next_cellx][next_celly]!=0) {
+                        next_val=Math.log(state.getBoard()[next_cellx][next_celly])/Math.log(2);
+
+                    }
+                }
+
+
+                if (cur_val > next_val) {
+                    totals[2] += next_val - cur_val;
+                } else if (next_val > cur_val) {
+                    totals[3] += cur_val - next_val;
+                }
+                current = next;
+                next++;
+            }
+        }
+        //System.out.println("TOTALS: " + totals[0] + " , "+ totals[1] + " , "+ totals[2] + " , "+ totals[3]);
+        double r = Math.pow(Math.max(totals[0], totals[1]), power) + Math.pow(Math.max(totals[2], totals[3]), power);
+        if ( Double.isInfinite(r) ){
+            System.out.println("NULL");
+        }
+
+        return r;
+    }
+
+
+    public boolean isHighestValueInCorner(){
+        int largestValueFound = 0;
+        int x=-1,y=-1;
+        for(int i = 0;i<state.getBoard().length;i++){
+            for(int j = 0;j<state.getBoard()[i].length;j++){
+                if(largestValueFound<state.getBoard()[i][j]){
+                   x = i;
+                    y = j;
+                }
+
+            }
+        }
+        if(x==0 && y == 0 || x == 0 && y == 3 || x == 3 && y == 0 || x == 3 || y == 3){
+            return true;
+        }
+        return false;
+    }
+
+    public double getHeuristicWeightScore() {
+        double sum = getHeuristicScore1();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
+        double newHeuristicScore = getHeuristicScore2();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
+        if (newHeuristicScore > sum) {
+            sum = newHeuristicScore;
+        }/*
+        newHeuristicScore = getHeuristicScore3();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
         }
-        newHeuristicScore = getHeuristicScore3()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
+        newHeuristicScore = getHeuristicScore4();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore() ;
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
-        }
-        newHeuristicScore = getHeuristicScore4()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
-        if (newHeuristicScore > sum) {
-            sum = newHeuristicScore;
-        }
+        }*/
         return sum;
-    }*/
+    }
+
+    public double getMonotonicityHeuristic(){
+        double increasingScore = getMonotonicity(true);
+        double descreasingScore = getMonotonicity(false);
+
+        if(increasingScore>descreasingScore){
+            return increasingScore;
+        }
+        return descreasingScore;
+
+    }
+
+    public double getMonotonicity(boolean increasing){
+        double score = 0;
+        int lastValue = 0;
+        for(int i = 0;i<state.getBoard().length;i++){
+            for(int j = 0;j<state.getBoard()[i].length;j++){
+                if(increasing){
+                    if(lastValue <= state.getBoard()[i][j]){
+                        lastValue = state.getBoard()[i][j];
+                        score+=state.getBoard()[i][j];
+                    }else{
+                        score-=state.getBoard()[i][j];
+                    }
+                }else{
+                    if(lastValue >= state.getBoard()[i][j]){
+                        lastValue = state.getBoard()[i][j];
+                        score+=state.getBoard()[i][j];
+                    }else{
+                        score-=state.getBoard()[i][j];
+                    }
+                }
+            }
+        }
+        lastValue = 0;
+        for(int i = 0;i<state.getBoard().length;i++){
+            for(int j = 0;j<state.getBoard()[i].length;j++){
+                if(increasing){
+                    if(lastValue <= state.getBoard()[j][i]){
+                        lastValue = state.getBoard()[j][i];
+                        score+=state.getBoard()[j][i];
+                    }else{
+                        score-=state.getBoard()[j][i];
+                    }
+                }else{
+                    if(lastValue >= state.getBoard()[j][i]){
+                        lastValue = state.getBoard()[j][i];
+                        score+=state.getBoard()[j][i];
+                    }else{
+                        score-=state.getBoard()[j][i];
+                    }
+                }
+            }
+        }
+        return score;
+    }
 
     public double getHeuristicScore1() {
         double sum = 0;
         for (int i = 0; i < state.getBoard().length; i++) {
             for (int j = 0; j < state.getBoard()[i].length; j++) {
-                sum += (state.getBoard()[i][j] * weightMatrix1[i][j]) * 100;
+                sum += (state.getBoard()[i][j] * weightMatrix1[i][j]);
             }
         }
         //sum += emptySize - getClusteringScore()*2;
@@ -207,7 +459,7 @@ public class SearchNode {
         double sum = 0;
         for (int i = 0; i < state.getBoard().length; i++) {
             for (int j = 0; j < state.getBoard()[i].length; j++) {
-                sum += (state.getBoard()[i][j] * weightMatrix2[i][j]) * 100;
+                sum += (state.getBoard()[i][j] * weightMatrix2[i][j]);
             }
         }
         //sum += emptySize - getClusteringScore()*2;
@@ -218,7 +470,7 @@ public class SearchNode {
         double sum = 0;
         for (int i = 0; i < state.getBoard().length; i++) {
             for (int j = 0; j < state.getBoard()[i].length; j++) {
-                sum += (state.getBoard()[i][j] * weightMatrix3[i][j]) * 100;
+                sum += (state.getBoard()[i][j] * weightMatrix3[i][j]);
             }
         }
         //sum += emptySize - getClusteringScore()*2;
@@ -229,7 +481,7 @@ public class SearchNode {
         double sum = 0;
         for (int i = 0; i < state.getBoard().length; i++) {
             for (int j = 0; j < state.getBoard()[i].length; j++) {
-                sum += (state.getBoard()[i][j] * weightMatrix4[i][j]) * 100;
+                sum += (state.getBoard()[i][j] * weightMatrix4[i][j]);
             }
         }
         //sum += emptySize - getClusteringScore()*2;
