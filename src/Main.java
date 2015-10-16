@@ -8,7 +8,7 @@ public class Main {
         Game twenty40eight = new Game(4,4);
         MinMax minMax = new MinMax(twenty40eight);
         SearchNode startNode = new SearchNode(0, twenty40eight.getEmptyTiles(twenty40eight.getBoardValues()), twenty40eight.getBoardValues());
-        minMax.start(startNode, 6);
+        minMax.start(startNode,10);
 
     }
 }

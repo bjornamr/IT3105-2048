@@ -170,13 +170,12 @@ public class SearchNode {
         return clusteringScore;
     }
 
-   /* public int getHeuristicScore() {
-        int score = (int) (nodeValue + Math.log(nodeValue) * emptySize - getClusteringScore());
-        System.out.println(score);
-        return Math.max(score, Math.min(nodeValue, 1));
-    }*/
+    public int getHeuristicScore() {
+        int score = (int) (state.getScore() + Math.log(state.getScore()) * state.getEmptyTiles() - getClusteringScore());
+        return Math.max(score, Math.min(state.getScore(), 1));
+    }
 
-    public double getHeuristicScore() {
+   /* public double getHeuristicScore() {
         double sum = getHeuristicScore1()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
         double newHeuristicScore = getHeuristicScore2()+(state.getEmptyTiles()*10)-getClusteringScore() + (state.getScore()*2);
         if (newHeuristicScore > sum) {
@@ -191,7 +190,7 @@ public class SearchNode {
             sum = newHeuristicScore;
         }
         return sum;
-    }
+    }*/
 
     public double getHeuristicScore1() {
         double sum = 0;

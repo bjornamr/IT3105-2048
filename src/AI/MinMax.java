@@ -3,6 +3,8 @@ import Game.Game;
 import Game.GameState;
 
 import java.util.ArrayList;
+import java.util.IntSummaryStatistics;
+import java.util.Map;
 
 /**
  * Created by Bjornars on 13.10.2015.
@@ -26,8 +28,8 @@ public class MinMax {
 
             }
 
-            //minMax(currentNode, depth, true);
-            alphabeta(currentNode,depth,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
+            //currentBestValue = minMax(currentNode, depth, true).getNode();
+            currentBestValue = alphabeta(currentNode,depth,Integer.MIN_VALUE,Integer.MAX_VALUE,true).getNode();
             while(currentBestValue.getParent().getParent() != null){
                 currentBestValue = currentBestValue.getParent();
             }
@@ -39,66 +41,93 @@ public class MinMax {
     }
 
     /// Start should be alpha = -inf beta=inf
-    public int alphabeta(SearchNode node, int depth,int alpha, int beta, boolean maximizing){
+    public ReturnValue alphabeta(SearchNode node, int depth,double alpha, double beta, boolean maximizing){
         if( depth ==0 || new SearchNode(node, 0).isGameOver()){
-            return node.getHeuristicScore();
+            return new ReturnValue(node,node.getHeuristicScore());
         }
         if (maximizing){
+            double value = Integer.MIN_VALUE;
+            ReturnValue ret = null;
             for(SearchNode child: getMaxChildren(node)) {
-                alpha = Math.max(alpha,alphabeta(child, depth-1 , alpha,beta,false));
+                double nodeValue = alphabeta(child, depth-1 , alpha,beta,false).getHeuristicValue();
+                if(nodeValue>value){
+                    value = nodeValue;
+                    ret = new ReturnValue(child, nodeValue);
+                }
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
-                if(alpha>=beta){
+                if(value>=beta){
                     currentBestValue = child;
-                    return beta;
+                    return new ReturnValue(child, value);
+
 
                 }
+                //alpha = Math.max(alpha,value);
+                if(value>alpha){
+                    alpha = value;
+                    ret = new ReturnValue(child, alpha);
+                }
             }
+            return ret;
         }else{
+            double value = Integer.MAX_VALUE;
+            ReturnValue ret = null;
             for(SearchNode child: getMaxChildren(node)) {
-                beta = Math.min(beta, alphabeta(child, depth - 1, alpha, beta, true));
+                double nodeValue =  alphabeta(child, depth - 1, alpha, beta, true).getHeuristicValue();
+                if(nodeValue<value){
+                    value = nodeValue;
+                    ret = new ReturnValue(child, nodeValue);
+                }
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
-                if (alpha >= beta) {
+                if (alpha >= value) {
                     currentBestValue = child;
-                    return alpha;
+                    return new ReturnValue(child,value);
 
                 }
+                //beta = Math.min(beta,value);
+                if(value<beta){
+                    ret = new ReturnValue(child,value);
+                }
             }
+            return ret;
         }
-        return beta;
 
     }
 
 
 
-    public double minMax(SearchNode node, int depth, boolean maximizing){
+    public ReturnValue minMax(SearchNode node, int depth, boolean maximizing){
         if( depth ==0 || new SearchNode(node, 0).isGameOver()){
-            return node.getHeuristicScore();
+            return new ReturnValue(node,node.getHeuristicScore());
         }
         if (maximizing){
             double bestValue = -999999999;
+            ReturnValue ret = null;
             for(SearchNode child: getMaxChildren(node)) {
-                double nodeValue = minMax(child, depth-1, false);
+                double nodeValue = minMax(child, depth-1, false).getHeuristicValue();
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
                 if(bestValue<nodeValue){
 
                     bestValue = nodeValue;
                     currentBestValue = child;
+                    ret = new ReturnValue(child, nodeValue);
                     //System.out.println(bestValue + " " + currentBestValue.getMovement());
                 }
             }
-            return bestValue;
+            return ret;
         }else{
             double bestValue = 999999999;
+            ReturnValue ret = null;
             for(SearchNode child: getMinChildren(node)){
-                double nodeValue = minMax(child, depth-1, true);
+                double nodeValue = minMax(child, depth-1, true).getHeuristicValue();
                // bestValue = Math.min(bestValue, minMax(child,depth-1,true));
                 if(bestValue>nodeValue){
                     bestValue = nodeValue;
                     currentBestValue = child;
+                    ret = new ReturnValue(child, nodeValue);
                    // System.out.println(bestValue + " " + currentBestValue.getMovement());
                 }
             }
-            return bestValue;
+            return ret;
         }
 
     }
