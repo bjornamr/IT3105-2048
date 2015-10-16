@@ -152,7 +152,7 @@ public class Game implements MyListener {
                     state.setTile(x,y,(lastValue * 2));
                     state.removeTile(j,i);
                     state.addToScore(lastValue*2);
-                    state.setEmptyTiles(state.getEmptyTiles() - 1);
+                    state.setEmptyTiles(state.getEmptyTiles() + 1);
                     lastValue = 0;
                     state.setChanged(true);
 
@@ -189,7 +189,7 @@ public class Game implements MyListener {
                     state.setTile(x,y,(lastValue * 2));
                     state.removeTile(j,i);
                     state.addToScore(lastValue * 2);
-                    state.setEmptyTiles(state.getEmptyTiles()-1);
+                    state.setEmptyTiles(state.getEmptyTiles()+1);
                     lastValue = 0;
                     state.setChanged(true);
                 }
@@ -226,7 +226,7 @@ public class Game implements MyListener {
                     state.setTile(x,y,(lastValue * 2));
                     state.removeTile(i, j);
                     state.addToScore(lastValue * 2);
-                    state.setEmptyTiles(state.getEmptyTiles()-1);
+                    state.setEmptyTiles(state.getEmptyTiles()+1);
                     lastValue = 0;
                     state.setChanged(true);
                 }
@@ -263,7 +263,7 @@ public class Game implements MyListener {
                     state.setTile(x,y,(lastValue * 2));
                     state.removeTile(i,j);
                     state.addToScore(lastValue * 2);
-                    state.setEmptyTiles(state.getEmptyTiles()-1);
+                    state.setEmptyTiles(state.getEmptyTiles()+1);
                     lastValue = 0;
                     state.setChanged(true);
                 }
