@@ -25,7 +25,9 @@ public class MinMax {
             }catch (Exception e){
 
             }
-            minMax(currentNode, depth, true);
+
+            //minMax(currentNode, depth, true);
+            alphabeta(currentNode,depth,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
             while(currentBestValue.getParent().getParent() != null){
                 currentBestValue = currentBestValue.getParent();
             }
@@ -35,6 +37,38 @@ public class MinMax {
             currentNode = new SearchNode(game.getScore(), game.getEmptyTiles(game.getBoardValues()), game.getBoardValues());
         }
     }
+
+    /// Start should be alpha = -inf beta=inf
+    public int alphabeta(SearchNode node, int depth,int alpha, int beta, boolean maximizing){
+        if( depth ==0 || new SearchNode(node, 0).isGameOver()){
+            return node.getHeuristicScore();
+        }
+        if (maximizing){
+            for(SearchNode child: getMaxChildren(node)) {
+                alpha = Math.max(alpha,alphabeta(child, depth-1 , alpha,beta,false));
+                //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
+                if(alpha>=beta){
+                    currentBestValue = child;
+                    return beta;
+
+                }
+            }
+        }else{
+            for(SearchNode child: getMaxChildren(node)) {
+                beta = Math.min(beta, alphabeta(child, depth - 1, alpha, beta, true));
+                //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
+                if (alpha >= beta) {
+                    currentBestValue = child;
+                    return alpha;
+
+                }
+            }
+        }
+        return beta;
+
+    }
+
+
 
     public double minMax(SearchNode node, int depth, boolean maximizing){
         if( depth ==0 || new SearchNode(node, 0).isGameOver()){
@@ -46,6 +80,7 @@ public class MinMax {
                 double nodeValue = minMax(child, depth-1, false);
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
                 if(bestValue<nodeValue){
+
                     bestValue = nodeValue;
                     currentBestValue = child;
                     //System.out.println(bestValue + " " + currentBestValue.getMovement());
