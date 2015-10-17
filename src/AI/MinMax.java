@@ -78,26 +78,31 @@ public class MinMax {
                     ret = new ReturnValue(child, alpha);
                 }
             }
+
             return ret;
         }else{
             double value = Integer.MAX_VALUE;
             ReturnValue ret = null;
-            for(SearchNode child: getMaxChildren(node)) {
+            for(SearchNode child: getMinChildren(node)) {
                 double nodeValue =  alphabeta(child, depth - 1, alpha, beta, true).getHeuristicValue();
                 if(nodeValue<value){
                     value = nodeValue;
                     ret = new ReturnValue(child, nodeValue);
                 }
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
-                if (alpha >= value) {
+                if (value <= alpha) {
                     currentBestValue = child;
                     return new ReturnValue(child,value);
 
                 }
                 //beta = Math.min(beta,value);
                 if(value<beta){
+                    beta = value;
                     ret = new ReturnValue(child,value);
                 }
+            }
+            if(ret == null){
+                return new ReturnValue(null,value);
             }
             return ret;
         }
@@ -191,6 +196,7 @@ public class MinMax {
                     }
                 }
                 newArray[xy[0]][xy[1]] = 2;
+
                 newArray2[xy[0]][xy[1]] = 4;
 
 
@@ -198,9 +204,11 @@ public class MinMax {
 
                 SearchNode temp = new SearchNode(parent);
                 temp.setBoard(newArray);
+                temp.getState().addToEmptyTiles(1);
                 sn.add(temp);
                 temp = new SearchNode(parent);
                 temp.setBoard(newArray2);
+                temp.getState().addToEmptyTiles(1);
                 sn.add(temp);
             }
         }

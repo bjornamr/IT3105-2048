@@ -5,6 +5,7 @@ import Game.CompareTiles;
 import java.util.ArrayList;
 import Game.GameState;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by Bjornars on 13.10.2015.
@@ -20,6 +21,10 @@ public class SearchNode {
     private double[][] weightMatrix2;
     private double[][] weightMatrix3;
     private double[][] weightMatrix4;
+    private double[][] weightMatrix5;
+    private double[][] weightMatrix6;
+    private double[][] weightMatrix7;
+    private double[][] weightMatrix8;
 
     private SearchNode parent;
 
@@ -80,6 +85,15 @@ public class SearchNode {
         weightMatrix2 = rotateArray(weightMatrix1);
         weightMatrix3 = rotateArray(weightMatrix2);
         weightMatrix4 = rotateArray(weightMatrix3);
+        weightMatrix5 = rotateArray(weightMatrix4);
+        Collections.reverse(Arrays.asList(weightMatrix5));
+        weightMatrix6 = rotateArray(weightMatrix1);
+        Collections.reverse(Arrays.asList(weightMatrix6));
+        weightMatrix7 = rotateArray(weightMatrix2);
+        Collections.reverse(Arrays.asList(weightMatrix7));
+        weightMatrix8 = rotateArray(weightMatrix3);
+        Collections.reverse(Arrays.asList(weightMatrix8));
+
     }
 
     public SearchNode(SearchNode copy, int movement) {
@@ -91,6 +105,10 @@ public class SearchNode {
         this.weightMatrix2 = copy.weightMatrix2;
         this.weightMatrix3 = copy.weightMatrix3;
         this.weightMatrix4 = copy.weightMatrix4;
+        this.weightMatrix5 = copy.weightMatrix5;
+        this.weightMatrix6 = copy.weightMatrix6;
+        this.weightMatrix7 = copy.weightMatrix7;
+        this.weightMatrix8 = copy.weightMatrix8;
         this.parent = copy;
     }
 
@@ -102,6 +120,10 @@ public class SearchNode {
         this.weightMatrix2 = copy.weightMatrix2;
         this.weightMatrix3 = copy.weightMatrix3;
         this.weightMatrix4 = copy.weightMatrix4;
+        this.weightMatrix5 = copy.weightMatrix5;
+        this.weightMatrix6 = copy.weightMatrix6;
+        this.weightMatrix7 = copy.weightMatrix7;
+        this.weightMatrix8 = copy.weightMatrix8;
         this.parent = copy;
     }
 
@@ -120,6 +142,8 @@ public class SearchNode {
         }
         return temp;
     }
+
+
 
 
     public void setState(GameState newState){
@@ -173,11 +197,11 @@ public class SearchNode {
     public double getHeuristicScore() {
         //System.out.println("mono: " +getMonotonicityHeuristic());
         //double score = (Math.log(state.getScore()) * state.getEmptyTiles()+getMonotonicity(3))+(getHeuristicWeightScore()*Math.log(state.getScore()))+getSmoothness();
-        double score = getMonotonicity(3)+getSmoothness()+Math.log(state.getScore())*state.getEmptyTiles();
-        System.out.println("MONO: " + getMonotonicity(3) +"\nsmooth: "+ getSmoothness() +"\nScore: "+ state.getScore()*0.5);
-        //double score = (state.getScore() + Math.log(state.getScore())*state.getEmptyTiles()) - getClusteringScore();
+        //double score = getMonotonicity(3)+getSmoothness()+Math.log(state.getScore())*state.getEmptyTiles();
+        //System.out.println("MONO: " + getMonotonicity(3) +"\nsmooth: "+ getSmoothness() +"\nScore: "+ state.getScore()*0.5);
+        double score = (state.getScore()/6 + Math.log(state.getScore())*state.getEmptyTiles())*1.9 - getClusteringScore() + getHeuristicWeightScore()*5 ;
         //System.out.println("MONO: " + getMonotonicity(3));
-        //double score = 2000 + (Math.log(state.getScore())*getHeuristicWeightScore()*state.getEmptyTiles())+(getMonotonicity(3)*3.7) + (heur_score(1.1)*(-1.5)) + (getSmoothness()*3.5);
+        //double score = 2000 + (27*state.getEmptyTiles())+(getMonotonicity(3)*4.7) + (heur_score(1.1)*(-1.5)) + (getSmoothness()*3.5);
         //double score = getMonotonicity(3);
         //System.out.println((getHeuristicWeightScore()*state.getEmptyTiles())*Math.log(state.getScore()));
         //System.out.println("SCORE: " + score);
@@ -376,7 +400,7 @@ public class SearchNode {
         double newHeuristicScore = getHeuristicScore2();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
-        }/*
+        }
         newHeuristicScore = getHeuristicScore3();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
@@ -384,7 +408,25 @@ public class SearchNode {
         newHeuristicScore = getHeuristicScore4();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore() ;
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
-        }*/
+        }
+        newHeuristicScore = getWeightedScore(weightMatrix5);//+(state.getEmptyTiles()*state.getScore())-getClusteringScore() ;
+        if (newHeuristicScore > sum) {
+            sum = newHeuristicScore;
+        }
+        newHeuristicScore = getWeightedScore(weightMatrix6);//+(state.getEmptyTiles()*state.getScore())-getClusteringScore() ;
+        if (newHeuristicScore > sum) {
+            sum = newHeuristicScore;
+        }
+        newHeuristicScore = getWeightedScore(weightMatrix7);//+(state.getEmptyTiles()*state.getScore())-getClusteringScore() ;
+        if (newHeuristicScore > sum) {
+            sum = newHeuristicScore;
+        }
+        newHeuristicScore = getWeightedScore(weightMatrix8);//+(state.getEmptyTiles()*state.getScore())-getClusteringScore() ;
+        if (newHeuristicScore > sum) {
+            sum = newHeuristicScore;
+        }
+
+
         return sum;
     }
 
@@ -442,6 +484,17 @@ public class SearchNode {
             }
         }
         return score;
+    }
+
+    public double getWeightedScore(double[][] array){
+        double sum = 0;
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array.length; j++) {
+                sum += (state.getBoard()[i][j] * array[i][j]);
+            }
+        }
+        //sum += emptySize - getClusteringScore()*2;
+        return sum;
     }
 
     public double getHeuristicScore1() {

@@ -280,6 +280,7 @@ public class Game implements MyListener {
                 }
             }
         }
+
         return moveRight(state, move);
     }
 
@@ -411,7 +412,7 @@ public class Game implements MyListener {
     }
 
     public GameState getGameState(){
-        return new GameState(board,score,false);
+        return new GameState(board,score,false, getEmptyTiles(getBoardValues()).size());
     }
 
     public void movement(int move) {
