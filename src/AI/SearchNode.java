@@ -193,13 +193,44 @@ public class SearchNode {
         }
         return clusteringScore;
     }
+    public double maxValueBoard(){
+        int max = 0;
+        for (int x=0; x<4; x++) {
+            for (int y=0; y<4; y++) {
+                if (state.getBoard()[x][y] != 0) {
+                    int value = state.getBoard()[x][y];
+                    if (value > max) {
+                        max = value;
+                    }
+                }
+            }
+        }
 
+        return Math.log(max) / Math.log(2);
+    }
+
+
+    double smoothWeight = 0.1;
+    double mono2weight = 1.0;
+    double emptyWeight = 2.7;
+    double maxweight = 1.0;
+    public double score(){
+        return //getSmoothness()*smoothWeight
+                getHeuristicWeightScore() + smoothWeight
+                + getMonotonicity() *mono2weight
+                + Math.log(state.getEmptyTiles())*emptyWeight
+                +maxValueBoard()*maxweight;
+    }
     public double getHeuristicScore() {
         //System.out.println("mono: " +getMonotonicityHeuristic());
         //double score = (Math.log(state.getScore()) * state.getEmptyTiles()+getMonotonicity(3))+(getHeuristicWeightScore()*Math.log(state.getScore()))+getSmoothness();
+
+
         //double score = getMonotonicity(3)+getSmoothness()+Math.log(state.getScore())*state.getEmptyTiles();
+        //change monopower
+
         //System.out.println("MONO: " + getMonotonicity(3) +"\nsmooth: "+ getSmoothness() +"\nScore: "+ state.getScore()*0.5);
-        double score = (state.getScore()/6 + Math.log(state.getScore())*state.getEmptyTiles())*1.9 - getClusteringScore() + getHeuristicWeightScore()*5 ;
+        // double score = (state.getScore()/6 + Math.log(state.getScore())*state.getEmptyTiles())*1.9 - getClusteringScore() + getHeuristicWeightScore()*5 ;
         //System.out.println("MONO: " + getMonotonicity(3));
         //double score = 2000 + (27*state.getEmptyTiles())+(getMonotonicity(3)*4.7) + (heur_score(1.1)*(-1.5)) + (getSmoothness()*3.5);
         //double score = getMonotonicity(3);
@@ -209,10 +240,16 @@ public class SearchNode {
         //System.out.println("AFTER: " + score);
         //score+= getHeuristicWeightScore()*1.6;
         //System.out.println("SCORE: " + score + "\nMONO: " + getMonotonicity(3));
-        if(Double.isInfinite(score)){
+
+
+      /* if(Double.isInfinite(score)){
             score = 0;
-        }
-        return score;
+        }*/
+
+
+        return score();
+
+        //return score();
 
         /*System.out.println("SCORE: " + score);
         if(isHighestValueInCorner()){
@@ -284,7 +321,7 @@ public class SearchNode {
         return false;
     }
 
-    public double getMonotonicity(int power){
+    public double getMonotonicity(){
         double[] totals = new double[4];
 
         for (int x = 0; x < 4; x++) {
@@ -368,7 +405,8 @@ public class SearchNode {
             }
         }
         //System.out.println("TOTALS: " + totals[0] + " , "+ totals[1] + " , "+ totals[2] + " , "+ totals[3]);
-        double r = Math.pow(Math.max(totals[0], totals[1]), power) + Math.pow(Math.max(totals[2], totals[3]), power);
+        //double r = Math.pow(Math.max(totals[0], totals[1]), power) + Math.pow(Math.max(totals[2], totals[3]), power);
+        double r = Math.max(totals[0], totals[1]) + Math.max(totals[2], totals[3]);
         if ( Double.isInfinite(r) ){
             System.out.println("NULL");
         }
