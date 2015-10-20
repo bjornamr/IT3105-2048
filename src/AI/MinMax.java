@@ -22,15 +22,22 @@ public class MinMax {
     public void start(SearchNode startNode, int depth){
         int moves = 0;
         SearchNode currentNode = startNode;
+        int currentDepth = depth;
         while(true) {
             try{
-                //Thread.sleep(1000);
+                //Thread.sleep(300);
             }catch (Exception e){
 
             }
 
-            //currentBestValue = minMax(currentNode, depth, true).getNode();
-            ReturnValue ret = alphabeta(currentNode,depth,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
+            //currentBestValue = minMax(currentNode, depth, true).getNode();'
+            int emptyTiles = game.getEmptyTiles(game.getBoardValues()).size();
+            if(emptyTiles>5){
+                currentDepth=depth;
+            }else{
+                currentDepth = depth+2;
+            }
+            ReturnValue ret = alphabeta(currentNode,currentDepth,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
             if(ret == null){
                 System.out.println("GAME OVER, total moves: " + moves);
 
@@ -54,13 +61,16 @@ public class MinMax {
     /// Start should be alpha = -inf beta=inf
     public ReturnValue alphabeta(SearchNode node, int depth,double alpha, double beta, boolean maximizing){
         if( depth ==0 || new SearchNode(node, 0).isGameOver()){
-            return new ReturnValue(node,node.getHeuristicScore());
+            return new ReturnValue(node,node.getHeuristicScore(game));
         }
         if (maximizing){
             double value = Integer.MIN_VALUE;
             ReturnValue ret = null;
             for(SearchNode child: getMaxChildren(node)) {
-                double nodeValue = alphabeta(child, depth-1 , alpha,beta,false).getHeuristicValue();
+
+                double nodeValue = alphabeta(child, depth - 1, alpha, beta, false).getHeuristicValue();
+
+
                 if(nodeValue>value){
                     value = nodeValue;
                     ret = new ReturnValue(child, nodeValue);
@@ -84,7 +94,8 @@ public class MinMax {
             double value = Integer.MAX_VALUE;
             ReturnValue ret = null;
             for(SearchNode child: getMinChildren(node)) {
-                double nodeValue =  alphabeta(child, depth - 1, alpha, beta, true).getHeuristicValue();
+                double nodeValue = alphabeta(child, depth - 1, alpha, beta, true).getHeuristicValue();
+
                 if(nodeValue<value){
                     value = nodeValue;
                     ret = new ReturnValue(child, nodeValue);
@@ -113,7 +124,7 @@ public class MinMax {
 
     public ReturnValue minMax(SearchNode node, int depth, boolean maximizing){
         if( depth ==0 || new SearchNode(node, 0).isGameOver()){
-            return new ReturnValue(node,node.getHeuristicScore());
+            return new ReturnValue(node,node.getHeuristicScore(game));
         }
         if (maximizing){
             double bestValue = -999999999;

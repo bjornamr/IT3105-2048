@@ -369,18 +369,23 @@ public class Game implements MyListener {
         return state;
     }
 
-    public boolean isGameOver() {
-        if (getEmptyTiles(board).isEmpty()) {
-            int[][] copyBoard = copyBoard();
-            //TODO: FIX THIS
-           /* if (!mergeTilesDown(copyBoard, getScore(), false)
-                    && !mergeTilesUp(copyBoard, getScore(), false)
-                    && !mergeTilesLeft(copyBoard, getScore(), false)
-                    && !mergeTilesRight(copyBoard, getScore(), false)) {
+    public boolean isGameOver(GameState state){
+        if(getEmptyTiles(state.getBoard()).size() == 0){
+
+            GameState up = mergeTilesUp(state.clone(),false);
+            GameState down = mergeTilesDown(state.clone(),false);
+            GameState left = mergeTilesLeft(state.clone(),false);
+            GameState right = mergeTilesRight(state.clone(),false);
+            if(!up.isChanged() && !down.isChanged() && !left.isChanged() && !right.isChanged()){
                 return true;
-            }*/
+            }
+
         }
         return false;
+    }
+
+    public GameState getGameStateTest(int[][] board){
+        return new GameState(board,score,false, getEmptyTiles(getBoardValues()).size());
     }
 
     public int[][] copyBoard() {

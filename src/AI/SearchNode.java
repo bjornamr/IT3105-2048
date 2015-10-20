@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import Game.GameState;
 import java.util.Arrays;
 import java.util.Collections;
+import Game.Game;
 
 /**
  * Created by Bjornars on 13.10.2015.
@@ -42,15 +43,37 @@ public class SearchNode {
         this.state.setEmptyTiles(emptycells.size());
         this.parent = null;
         weightMatrix1 = new double[4][4];
-        weightMatrix1[0][0] = 0.135759;
-        weightMatrix1[0][1] = 0.121925;
-        weightMatrix1[0][2] = 0.102812;
-        weightMatrix1[0][3] = 0.099937;
+        weightMatrix1[0][0] = 65536;
+        weightMatrix1[0][1] = 32768;
+        weightMatrix1[0][2] = 16384;
+        weightMatrix1[0][3] = 8192;
 
-        weightMatrix1[1][0] = 0.0997992;
-        weightMatrix1[1][1] = 0.0888405;
-        weightMatrix1[1][2] = 0.076711;
-        weightMatrix1[1][3] = 0.0724143;
+        weightMatrix1[1][0] = 512;
+        weightMatrix1[1][1] = 1024;
+        weightMatrix1[1][2] = 2048;
+        weightMatrix1[1][3] = 4096;
+
+        weightMatrix1[2][0] = 32;
+        weightMatrix1[2][1] = 64;
+        weightMatrix1[2][2] = 128;
+        weightMatrix1[2][3] = 256;
+
+        weightMatrix1[3][0] = 2;
+        weightMatrix1[3][1] = 4;
+        weightMatrix1[3][2] = 8;
+        weightMatrix1[3][3] = 16;
+
+
+        /*weightMatrix1 = new double[4][4];
+        weightMatrix1[0][0] = 0.135759*1.7;
+        weightMatrix1[0][1] = 0.121925*1.55;
+        weightMatrix1[0][2] = 0.102812*1.4;
+        weightMatrix1[0][3] = 0.099937*1.3;
+
+        weightMatrix1[1][0] = 0.0997992*1.45;
+        weightMatrix1[1][1] = 0.0888405*1.40;
+        weightMatrix1[1][2] = 0.076711*1.35;
+        weightMatrix1[1][3] = 0.0724143*1.2;
 
         weightMatrix1[2][0] = 0.060654;
         weightMatrix1[2][1] = 0.0562579;
@@ -61,7 +84,7 @@ public class SearchNode {
         weightMatrix1[3][1] = 0.00992495;
         weightMatrix1[3][2] = 0.00575871;
         weightMatrix1[3][3] = 0.00335193;
-        /*weightMatrix1[0][0] = 10;
+        weightMatrix1[0][0] = 10;
         weightMatrix1[0][1] = 9;
         weightMatrix1[0][2] = 8;
         weightMatrix1[0][3] = 7;
@@ -221,7 +244,7 @@ public class SearchNode {
                 + Math.log(state.getEmptyTiles())*emptyWeight
                 +maxValueBoard()*maxweight;
     }
-    public double getHeuristicScore() {
+    public double getHeuristicScore(Game game) {
         //System.out.println("mono: " +getMonotonicityHeuristic());
         //double score = (Math.log(state.getScore()) * state.getEmptyTiles()+getMonotonicity(3))+(getHeuristicWeightScore()*Math.log(state.getScore()))+getSmoothness();
 
@@ -230,7 +253,18 @@ public class SearchNode {
         //change monopower
 
         //System.out.println("MONO: " + getMonotonicity(3) +"\nsmooth: "+ getSmoothness() +"\nScore: "+ state.getScore()*0.5);
-        // double score = (state.getScore()/6 + Math.log(state.getScore())*state.getEmptyTiles())*1.9 - getClusteringScore() + getHeuristicWeightScore()*5 ;
+         double score = ((getHeuristicWeightScore()*Math.log(state.getEmptyTiles()))) +Math.log(state.getScore())*state.getEmptyTiles() - getClusteringScore();
+
+        if(state.getEmptyTiles()<5){
+            score*=0.80;
+        }
+        if (game.isGameOver(state)) {
+            score = Double.MIN_VALUE;
+        }
+        if(game.getScore()>750){
+            //System.out.println((getHeuristicWeightScore()*Math.log(state.getEmptyTiles()))+" | " +  Math.log(state.getScore())*state.getEmptyTiles() + " | " + getClusteringScore());
+        }
+        //double score = (Math.log(state.getScore())*state.getEmptyTiles())*1.9 - getClusteringScore() + ((Math.log(getHeuristicWeightScore()*5))*10state.getEmptyTiles())) ;
         //System.out.println("MONO: " + getMonotonicity(3));
         //double score = 2000 + (27*state.getEmptyTiles())+(getMonotonicity(3)*4.7) + (heur_score(1.1)*(-1.5)) + (getSmoothness()*3.5);
         //double score = getMonotonicity(3);
@@ -240,14 +274,19 @@ public class SearchNode {
         //System.out.println("AFTER: " + score);
         //score+= getHeuristicWeightScore()*1.6;
         //System.out.println("SCORE: " + score + "\nMONO: " + getMonotonicity(3));
+       // if(state.getScore()>1000){
+           // System.out.println(((state.getScore()/5) + " | " + (Math.log(state.getScore())*state.getEmptyTiles()*1.9)+ " | " + getClusteringScore() + " | " + (Math.log(getHeuristicWeightScore()*5))*10*state.getEmptyTiles()));
+        //}
 
 
-      /* if(Double.isInfinite(score)){
+        //System.out.println(" - " +  getClusteringScore()  +" + " + ((getHeuristicWeightScore())*Math.pow(state.getEmptyTiles(),1.5) + " = " + score));
+        if(Double.isInfinite(score)){
             score = 0;
-        }*/
+        }
 
 
-        return score();
+
+        return score;
 
         //return score();
 
@@ -434,16 +473,16 @@ public class SearchNode {
     }
 
     public double getHeuristicWeightScore() {
-        double sum = getHeuristicScore1();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
-        double newHeuristicScore = getHeuristicScore2();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
+        double sum = getWeightedScore(weightMatrix1);//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
+        double newHeuristicScore = getWeightedScore(weightMatrix2);//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
         }
-        newHeuristicScore = getHeuristicScore3();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
+        newHeuristicScore = getWeightedScore(weightMatrix3);//+(state.getEmptyTiles()*state.getScore())-getClusteringScore();
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
         }
-        newHeuristicScore = getHeuristicScore4();//+(state.getEmptyTiles()*state.getScore())-getClusteringScore() ;
+        newHeuristicScore = getWeightedScore(weightMatrix4);//+(state.getEmptyTiles()*state.getScore())-getClusteringScore() ;
         if (newHeuristicScore > sum) {
             sum = newHeuristicScore;
         }
@@ -528,56 +567,13 @@ public class SearchNode {
         double sum = 0;
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array.length; j++) {
-                sum += (state.getBoard()[i][j] * array[i][j]);
+                sum += (state.getBoard()[i][j] * (array[i][j]/90000));
             }
         }
         //sum += emptySize - getClusteringScore()*2;
         return sum;
     }
 
-    public double getHeuristicScore1() {
-        double sum = 0;
-        for (int i = 0; i < state.getBoard().length; i++) {
-            for (int j = 0; j < state.getBoard()[i].length; j++) {
-                sum += (state.getBoard()[i][j] * weightMatrix1[i][j]);
-            }
-        }
-        //sum += emptySize - getClusteringScore()*2;
-        return sum;
-    }
-
-    public double getHeuristicScore2() {
-        double sum = 0;
-        for (int i = 0; i < state.getBoard().length; i++) {
-            for (int j = 0; j < state.getBoard()[i].length; j++) {
-                sum += (state.getBoard()[i][j] * weightMatrix2[i][j]);
-            }
-        }
-        //sum += emptySize - getClusteringScore()*2;
-        return sum;
-    }
-
-    public double getHeuristicScore3() {
-        double sum = 0;
-        for (int i = 0; i < state.getBoard().length; i++) {
-            for (int j = 0; j < state.getBoard()[i].length; j++) {
-                sum += (state.getBoard()[i][j] * weightMatrix3[i][j]);
-            }
-        }
-        //sum += emptySize - getClusteringScore()*2;
-        return sum;
-    }
-
-    public double getHeuristicScore4() {
-        double sum = 0;
-        for (int i = 0; i < state.getBoard().length; i++) {
-            for (int j = 0; j < state.getBoard()[i].length; j++) {
-                sum += (state.getBoard()[i][j] * weightMatrix4[i][j]);
-            }
-        }
-        //sum += emptySize - getClusteringScore()*2;
-        return sum;
-    }
 
     public int[][] getGridValues() {
         return state.getBoard();
