@@ -11,7 +11,7 @@ public class ReturnValue {
 
     public ReturnValue(SearchNode node, double heuristicValue){
         this.node = node;
-        this.heuristicValue = heuristicValue;
+        this.heuristicValue = heuristicValue; // heuristic or prob?
     }
 
     public SearchNode getNode() {

@@ -44,6 +44,43 @@ public class SearchNode {
         this.parent = null;
         weightMatrix1 = new double[4][4];
         weightMatrix1[0][0] = 65536;
+
+        weightMatrix1[0][1] = 32768;
+        weightMatrix1[1][0] = 32768;
+
+        weightMatrix1[2][0] = 16384;
+        weightMatrix1[1][1] = 16384;
+        weightMatrix1[0][2] = 16384;
+
+        weightMatrix1[3][0] = 8182;
+        weightMatrix1[2][1] = 8192;
+        weightMatrix1[1][2] = 8192;
+        weightMatrix1[0][3] = 8192;
+
+        weightMatrix1[3][1] = 4096;
+        weightMatrix1[2][2] = 4096;
+        weightMatrix1[1][3] = 4096;
+
+        weightMatrix1[2][3] = 2048;
+        weightMatrix1[2][3] = 2048;
+
+        weightMatrix1[3][3] = 1024;
+
+        /*
+        weightMatrix1[0][0] = 65536;
+        weightMatrix1[0][1] = 32768;
+        weightMatrix1[0][2] = 16384;
+        weightMatrix1[0][3] = 8192;
+        weightMatrix1[0][0] = 65536;
+        weightMatrix1[0][1] = 32768;
+        weightMatrix1[0][2] = 16384;
+        weightMatrix1[0][3] = 8192;
+        weightMatrix1[0][0] = 65536;
+        weightMatrix1[0][1] = 32768;
+        weightMatrix1[0][2] = 16384;
+        weightMatrix1[0][3] = 8192;*/
+
+       /* weightMatrix1[0][0] = 65536;
         weightMatrix1[0][1] = 32768;
         weightMatrix1[0][2] = 16384;
         weightMatrix1[0][3] = 8192;
@@ -62,6 +99,7 @@ public class SearchNode {
         weightMatrix1[3][1] = 4;
         weightMatrix1[3][2] = 8;
         weightMatrix1[3][3] = 16;
+        */
 
 
         /*weightMatrix1 = new double[4][4];
@@ -244,6 +282,7 @@ public class SearchNode {
                 + Math.log(state.getEmptyTiles())*emptyWeight
                 +maxValueBoard()*maxweight;
     }
+    boolean checker = false;
     public double getHeuristicScore(Game game) {
         //System.out.println("mono: " +getMonotonicityHeuristic());
         //double score = (Math.log(state.getScore()) * state.getEmptyTiles()+getMonotonicity(3))+(getHeuristicWeightScore()*Math.log(state.getScore()))+getSmoothness();
@@ -253,7 +292,11 @@ public class SearchNode {
         //change monopower
 
         //System.out.println("MONO: " + getMonotonicity(3) +"\nsmooth: "+ getSmoothness() +"\nScore: "+ state.getScore()*0.5);
-         double score = ((getHeuristicWeightScore()*Math.log(state.getEmptyTiles()))) +Math.log(state.getScore())*state.getEmptyTiles() - getClusteringScore();
+
+
+
+
+       /*  double score = ((getHeuristicWeightScore()*Math.log(state.getEmptyTiles()))) +Math.log(state.getScore())*state.getEmptyTiles() - getClusteringScore();
 
         if(state.getEmptyTiles()<5){
             score*=0.80;
@@ -263,7 +306,47 @@ public class SearchNode {
         }
         if(game.getScore()>750){
             //System.out.println((getHeuristicWeightScore()*Math.log(state.getEmptyTiles()))+" | " +  Math.log(state.getScore())*state.getEmptyTiles() + " | " + getClusteringScore());
+        }*/
+
+        if(state.getScore() == 0){
+            return 0;
         }
+
+
+
+        //System.out.println(getHeuristicWeightScore()+ " - " + Math.log(getHeuristicWeightScore() * state.getEmptyTiles()) + " - " + -getClusteringScore());
+        double score = getHeuristicWeightScore() + Math.log(getHeuristicWeightScore() * state.getEmptyTiles()) - getClusteringScore()*20;
+
+        if(checker==false) {
+            for (int i = 0; i < state.getBoard().length; i++) {
+                for (int j = 0; j < state.getBoard()[i].length; j++) {
+                    if (state.getBoard()[i][j] >= 512) {
+
+                        score = getHeuristicWeightScore() + Math.log(getHeuristicWeightScore() * state.getEmptyTiles()) - getClusteringScore() * 20;
+                        // 20 ble 1024
+                        // 200 ble 512
+                        checker = true;
+                        return Math.max(score*10,getScore());
+                        //return score;
+                       // return Math.max(score,getScore());
+
+                    }
+
+                }
+            }
+        }
+        if(checker){
+             score = getHeuristicWeightScore() + Math.log(getHeuristicWeightScore() * state.getEmptyTiles()) - getClusteringScore() * 20;
+
+            System.out.println("score: "+ score*10+ " - " +getScore());
+            return Math.max(score*10,getScore());
+
+            //return score;
+           // return Math.max(score, getScore());
+        }
+
+
+
         //double score = (Math.log(state.getScore())*state.getEmptyTiles())*1.9 - getClusteringScore() + ((Math.log(getHeuristicWeightScore()*5))*10state.getEmptyTiles())) ;
         //System.out.println("MONO: " + getMonotonicity(3));
         //double score = 2000 + (27*state.getEmptyTiles())+(getMonotonicity(3)*4.7) + (heur_score(1.1)*(-1.5)) + (getSmoothness()*3.5);
@@ -280,13 +363,15 @@ public class SearchNode {
 
 
         //System.out.println(" - " +  getClusteringScore()  +" + " + ((getHeuristicWeightScore())*Math.pow(state.getEmptyTiles(),1.5) + " = " + score));
-        if(Double.isInfinite(score)){
+
+
+        /*if(Double.isInfinite(score)){
             score = 0;
-        }
+        }*/
 
 
-
-        return score;
+        return Math.max(score*100,state.getScore());
+        //return score;
 
         //return score();
 
@@ -618,4 +703,13 @@ public class SearchNode {
         }
         return ret;
     }
+
+
+    @Override
+    protected SearchNode clone() throws CloneNotSupportedException {
+        return (SearchNode)super.clone();
+    }
 }
+
+
+

@@ -38,6 +38,7 @@ public class MinMax {
                 currentDepth = depth+2;
             }
             ReturnValue ret = alphabeta(currentNode,currentDepth,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
+            //ReturnValue ret = expectimax(currentNode,currentDepth,true);
             if(ret == null){
                 System.out.println("GAME OVER, total moves: " + moves);
 
@@ -157,6 +158,87 @@ public class MinMax {
             return ret;
         }
 
+    }
+
+    /*
+    function expectiminimax(node, depth)
+   ## if node is a terminal node or depth = 0
+    ##    return the heuristic value of node
+    if the adversary is to play at node
+        // Return value of minimum-valued child node
+        let ? := +?
+        foreach child of node
+            ? := min(?, expectiminimax(child, depth-1))
+    else if we are to play at node
+        // Return value of maximum-valued child node
+        let ? := -?
+        foreach child of node
+            ? := max(?, expectiminimax(child, depth-1))
+    else if random event at node
+        // Return weighted average of all child nodes' values
+        let ? := 0
+        foreach child of node
+            ? := ? + (Probability[child] * expectiminimax(child, depth-1))
+    return ?
+     */
+
+    public ReturnValue expectimax(SearchNode node, int depth, boolean maximizing) {
+        if( depth ==0 || new SearchNode(node, 0).isGameOver()){
+            return new ReturnValue(node,node.getHeuristicScore(game));
+        }
+        if (maximizing){
+            double bestValue = Double.MIN_VALUE;
+            ReturnValue ret = null;
+            for(SearchNode child: getMaxChildren(node)) {
+                double nodeValue = expectimax(child, depth - 1, false).getHeuristicValue();
+                //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
+                if(bestValue<nodeValue){
+
+                    bestValue = nodeValue;
+                    currentBestValue = child;
+                    ret = new ReturnValue(child, nodeValue);
+                    //System.out.println(bestValue + " " + currentBestValue.getMovement());
+                }
+            }
+            return ret;
+
+        }else {
+            double bestScore=0;
+            ReturnValue ret = null;
+            ArrayList<Integer> empty =game.getEmptyTiles(node.getState().getBoard());
+            if(empty.size() == 0 ){
+                return new ReturnValue(node,node.getHeuristicScore(game));
+            }
+
+            int [] possibleValues =new int[]{2,4};
+
+            for(int emptyInd = 0; emptyInd < empty.size(); emptyInd++){
+                int[] index = game.i1Dto2D(empty.get(emptyInd));
+                for(int value : possibleValues){
+                    int[][] board = node.getState().getBoard().clone();
+                    board[index[0]][index[1]] = value;
+                    SearchNode n = node; // TODO: IS THIS ENOUGH OR DOES IT NEED TO BE CLONED?
+                    // TODO: CHECK IF THIS WORKS WITHOUT clonemethod in SN
+
+                    for (int i = 0; i<n.getState().getBoard().length; i++){
+                        for(int j =0; j<n.getState().getBoard()[i].length; j++){
+                            n.getState().getBoard()[i][j]  =board[i][j];
+                        }
+                    }
+                    double probability =((value == 2) ? 0.9 : 0.1);
+                    ret  = expectimax(n, depth - 1, maximizing);
+
+                    bestScore += ret.getHeuristicValue() *probability;
+                }
+
+
+            }
+            bestScore = bestScore / empty.size();
+            ret = new ReturnValue(node,bestScore);
+
+            return ret;
+
+        }
     }
 
     // TODO: test if normal array is faster and check if score is updated
