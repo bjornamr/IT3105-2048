@@ -1,8 +1,11 @@
 package AI;
+
 import Game.Game;
 import Game.GameState;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.IntSummaryStatistics;
 import java.util.Map;
 
@@ -15,36 +18,134 @@ public class MinMax {
     private SearchNode currentBestValue;
 
 
-    public MinMax(Game game){
+    public MinMax(Game game) {
         this.game = game;
     }
 
-    public void start(SearchNode startNode, int depth){
+    public void start(SearchNode startNode, int depth) {
         int moves = 0;
         SearchNode currentNode = startNode;
         int currentDepth = depth;
-        while(true) {
-            try{
+        Date time = new Date();
+        while (true) {
+            try {
                 //Thread.sleep(300);
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
+            long oldTime = time.getTime();
 
             //currentBestValue = minMax(currentNode, depth, true).getNode();'
-            int emptyTiles = game.getEmptyTiles(game.getBoardValues()).size();
+            /*int emptyTiles = game.getEmptyTiles(game.getBoardValues()).size();
             if(emptyTiles>5){
                 currentDepth=depth;
             }else{
                 currentDepth = depth+2;
-            }
-            ReturnValue ret = alphabeta(currentNode,currentDepth,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
+            }*/
+            ReturnValue ret = null;
+            /*ArrayList<SearchNode> startingMoves = getMaxChildren(currentNode);
+            if (startingMoves.size() == 4) {
+                TreeThread thread1 = new TreeThread(startingMoves.get(0), currentDepth, false, );
+                TreeThread thread2 = new TreeThread(startingMoves.get(1), currentDepth, false, game);
+                TreeThread thread3 = new TreeThread(startingMoves.get(2), currentDepth, false, game);
+                TreeThread thread4 = new TreeThread(startingMoves.get(3), currentDepth, false, game);
+
+                thread1.start();
+                thread2.start();
+                thread3.start();
+                thread4.start();
+
+                try {
+                    thread1.join();
+                    thread2.join();
+                    thread3.join();
+                    thread4.join();
+                } catch (InterruptedException e) {
+                    System.out.println("EXCEPTION");
+                }
+                ret = thread1.getValues();
+                if (thread2.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
+                    ret = thread2.getValues();
+                }
+                if (thread3.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
+                    ret = thread3.getValues();
+                }
+                if (thread4.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
+                    ret = thread4.getValues();
+                }
+
+            } else if (startingMoves.size() == 3) {
+                TreeThread thread1 = new TreeThread(startingMoves.get(0), currentDepth, false, game);
+                TreeThread thread2 = new TreeThread(startingMoves.get(1), currentDepth, false, game);
+                TreeThread thread3 = new TreeThread(startingMoves.get(2), currentDepth, false, game);
+
+                thread1.start();
+                thread2.start();
+                thread3.start();
+
+                try {
+                    thread1.join();
+                    thread2.join();
+                    thread3.join();
+                } catch (InterruptedException e) {
+                    System.out.println("EXCEPTION");
+                }
+                ret = thread1.getValues();
+                if (thread2.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
+                    ret = thread2.getValues();
+                }
+                if (thread3.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
+                    ret = thread3.getValues();
+                }
+
+            }else if(startingMoves.size() == 2){
+                TreeThread thread1 = new TreeThread(startingMoves.get(0), currentDepth, false, game);
+                TreeThread thread2 = new TreeThread(startingMoves.get(1), currentDepth, false, game);
+
+                thread1.start();
+                thread2.start();
+
+                try {
+                    thread1.join();
+                    thread2.join();
+                } catch (InterruptedException e) {
+                    System.out.println("EXCEPTION");
+                }
+                ret = thread1.getValues();
+                if (thread2.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
+                    ret = thread2.getValues();
+                }
+
+            }else if(startingMoves.size() == 1){
+                TreeThread thread1 = new TreeThread(startingMoves.get(0), currentDepth, false, game);
+
+                thread1.start();
+
+                try {
+                    thread1.join();
+                } catch (InterruptedException e) {
+                    System.out.println("EXCEPTION");
+                }
+                ret = thread1.getValues();
+
+            }else{
+                System.out.println("GAME OVER");
+                System.out.println("TOTAL MOVES: " + moves);
+                return;
+            }*/
+
+            ret = expectimax(currentNode, currentDepth, true);
             //ReturnValue ret = expectimax(currentNode,currentDepth,true);
-            if(ret == null){
+            time = new Date();
+            long currentTime = time.getTime() - oldTime;
+            System.out.println("The AI used " + (currentTime / 1000) + " seconds to think");
+
+            if (ret == null) {
                 System.out.println("GAME OVER, total moves: " + moves);
 
             }
             currentBestValue = ret.getNode();
-            while(currentBestValue.getParent().getParent() != null){
+            while (currentBestValue.getParent().getParent() != null) {
                 currentBestValue = currentBestValue.getParent();
             }
             //System.out.println("Current movement: " + currentBestValue.getMovement());
@@ -55,66 +156,135 @@ public class MinMax {
         }
     }
 
+    public class TreeThread extends Thread {
+        private SearchNode startNode;
+        private int totalDepth;
+        private boolean aiTurn;
+        private ReturnValue returnValue;
+        private Game game;
+
+        public TreeThread(SearchNode startNode, int totalDepth, boolean aiTurn, Game game) {
+            this.startNode = startNode;
+            this.totalDepth = totalDepth;
+            this.aiTurn = aiTurn;
+            this.game = game;
+
+        }
+
+        public ReturnValue expectimax(SearchNode node, int depth, boolean maximizing) {
+            if (depth == 0 || new SearchNode(node, 0).isGameOver()) {
+                return new ReturnValue(node, node.getHeuristicScore(game));
+            }
+            if (maximizing) {
+                double bestValue = Double.MIN_VALUE;
+                ReturnValue ret = null;
+                for (SearchNode child : getMaxChildren(node)) {
+                    double nodeValue = expectimax(child, depth - 1, false).getHeuristicValue();
+                    //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
+                    if (bestValue < nodeValue) {
+
+                        bestValue = nodeValue;
+                        currentBestValue = child;
+                        ret = new ReturnValue(child, nodeValue);
+                        //System.out.println(bestValue + " " + currentBestValue.getMovement());
+                    }
+                }
+                return ret;
+
+            } else {
+                double bestScore = 0;
+                ReturnValue ret = null;
+
+                for(SearchNode child : getMinChildren(node)){
+                    double nodeValue = expectimax(child, depth-1, true).getHeuristicValue();
+                    double probability = 0.9;
+                    if(child.getMovement() == 4){
+                        probability = 0.1;
+                    }
+                    nodeValue = nodeValue * probability;
+                    if(nodeValue>bestScore){
+                        ret = new ReturnValue(child,nodeValue);
+                        bestScore = nodeValue;
+                    }
+                }
+                if(ret==null){
+                    return new ReturnValue(null, bestScore);
+                }
 
 
+
+                return ret;
+
+            }
+        }
+
+        @Override
+        public void run() {
+            returnValue = expectimax(startNode, totalDepth, aiTurn);
+        }
+
+        public ReturnValue getValues() {
+            return returnValue;
+        }
+    }
 
 
     /// Start should be alpha = -inf beta=inf
-    public ReturnValue alphabeta(SearchNode node, int depth,double alpha, double beta, boolean maximizing){
-        if( depth ==0 || new SearchNode(node, 0).isGameOver()){
-            return new ReturnValue(node,node.getHeuristicScore(game));
+    public ReturnValue alphabeta(SearchNode node, int depth, double alpha, double beta, boolean maximizing) {
+        if (depth == 0 || new SearchNode(node, 0).isGameOver()) {
+            return new ReturnValue(node, node.getHeuristicScore(game));
         }
-        if (maximizing){
+        if (maximizing) {
             double value = Integer.MIN_VALUE;
             ReturnValue ret = null;
-            for(SearchNode child: getMaxChildren(node)) {
+            for (SearchNode child : getMaxChildren(node)) {
 
                 double nodeValue = alphabeta(child, depth - 1, alpha, beta, false).getHeuristicValue();
 
 
-                if(nodeValue>value){
+                if (nodeValue > value) {
                     value = nodeValue;
                     ret = new ReturnValue(child, nodeValue);
                 }
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
-                if(value>=beta){
+                if (value >= beta) {
                     currentBestValue = child;
                     return new ReturnValue(child, value);
 
 
                 }
                 //alpha = Math.max(alpha,value);
-                if(value>alpha){
+                if (value > alpha) {
                     alpha = value;
                     ret = new ReturnValue(child, alpha);
                 }
             }
 
             return ret;
-        }else{
+        } else {
             double value = Integer.MAX_VALUE;
             ReturnValue ret = null;
-            for(SearchNode child: getMinChildren(node)) {
+            for (SearchNode child : getMinChildren(node)) {
                 double nodeValue = alphabeta(child, depth - 1, alpha, beta, true).getHeuristicValue();
 
-                if(nodeValue<value){
+                if (nodeValue < value) {
                     value = nodeValue;
                     ret = new ReturnValue(child, nodeValue);
                 }
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
                 if (value <= alpha) {
                     currentBestValue = child;
-                    return new ReturnValue(child,value);
+                    return new ReturnValue(child, value);
 
                 }
                 //beta = Math.min(beta,value);
-                if(value<beta){
+                if (value < beta) {
                     beta = value;
-                    ret = new ReturnValue(child,value);
+                    ret = new ReturnValue(child, value);
                 }
             }
-            if(ret == null){
-                return new ReturnValue(null,value);
+            if (ret == null) {
+                return new ReturnValue(null, value);
             }
             return ret;
         }
@@ -122,18 +292,17 @@ public class MinMax {
     }
 
 
-
-    public ReturnValue minMax(SearchNode node, int depth, boolean maximizing){
-        if( depth ==0 || new SearchNode(node, 0).isGameOver()){
-            return new ReturnValue(node,node.getHeuristicScore(game));
+    public ReturnValue minMax(SearchNode node, int depth, boolean maximizing) {
+        if (depth == 0 || new SearchNode(node, 0).isGameOver()) {
+            return new ReturnValue(node, node.getHeuristicScore(game));
         }
-        if (maximizing){
+        if (maximizing) {
             double bestValue = -999999999;
             ReturnValue ret = null;
-            for(SearchNode child: getMaxChildren(node)) {
-                double nodeValue = minMax(child, depth-1, false).getHeuristicValue();
+            for (SearchNode child : getMaxChildren(node)) {
+                double nodeValue = minMax(child, depth - 1, false).getHeuristicValue();
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
-                if(bestValue<nodeValue){
+                if (bestValue < nodeValue) {
 
                     bestValue = nodeValue;
                     currentBestValue = child;
@@ -142,17 +311,17 @@ public class MinMax {
                 }
             }
             return ret;
-        }else{
+        } else {
             double bestValue = 999999999;
             ReturnValue ret = null;
-            for(SearchNode child: getMinChildren(node)){
-                double nodeValue = minMax(child, depth-1, true).getHeuristicValue();
-               // bestValue = Math.min(bestValue, minMax(child,depth-1,true));
-                if(bestValue>nodeValue){
+            for (SearchNode child : getMinChildren(node)) {
+                double nodeValue = minMax(child, depth - 1, true).getHeuristicValue();
+                // bestValue = Math.min(bestValue, minMax(child,depth-1,true));
+                if (bestValue > nodeValue) {
                     bestValue = nodeValue;
                     currentBestValue = child;
                     ret = new ReturnValue(child, nodeValue);
-                   // System.out.println(bestValue + " " + currentBestValue.getMovement());
+                    // System.out.println(bestValue + " " + currentBestValue.getMovement());
                 }
             }
             return ret;
@@ -183,16 +352,16 @@ public class MinMax {
      */
 
     public ReturnValue expectimax(SearchNode node, int depth, boolean maximizing) {
-        if( depth ==0 || new SearchNode(node, 0).isGameOver()){
-            return new ReturnValue(node,node.getHeuristicScore(game));
+        if (depth == 0 || new SearchNode(node, 0).isGameOver()) {
+            return new ReturnValue(node, node.getHeuristicScore(game));
         }
-        if (maximizing){
+        if (maximizing) {
             double bestValue = Double.MIN_VALUE;
             ReturnValue ret = null;
-            for(SearchNode child: getMaxChildren(node)) {
+            for (SearchNode child : getMaxChildren(node)) {
                 double nodeValue = expectimax(child, depth - 1, false).getHeuristicValue();
                 //bestValue = Math.max(bestValue, minMax(child, depth - 1, false));
-                if(bestValue<nodeValue){
+                if (bestValue < nodeValue) {
 
                     bestValue = nodeValue;
                     currentBestValue = child;
@@ -202,39 +371,45 @@ public class MinMax {
             }
             return ret;
 
-        }else {
-            double bestScore=0;
+        } else {
+            double bestScore = 0;
             ReturnValue ret = null;
-            ArrayList<Integer> empty =game.getEmptyTiles(node.getState().getBoard());
-            if(empty.size() == 0 ){
-                return new ReturnValue(node,node.getHeuristicScore(game));
+            ArrayList<Integer> empty = game.getEmptyTiles(node.getState().getBoard());
+            if (empty.size() == 0) {
+                return new ReturnValue(node, node.getHeuristicScore(game));
             }
 
-            int [] possibleValues =new int[]{2,4};
+            int[] possibleValues = new int[]{2, 4};
 
-            for(int emptyInd = 0; emptyInd < empty.size(); emptyInd++){
+            for (int emptyInd = 0; emptyInd < empty.size(); emptyInd++) {
                 int[] index = game.i1Dto2D(empty.get(emptyInd));
-                for(int value : possibleValues){
-                    int[][] board = node.getState().getBoard().clone();
+                for (int value : possibleValues) {
+                    SearchNode n = null;
+                    try {
+                        n = node.clone();
+                    } catch (CloneNotSupportedException e) {
+                        System.out.println("Could not clone node in expectimax");
+                    }
+                    int[][] board = n.getState().getBoard();
                     board[index[0]][index[1]] = value;
-                    SearchNode n = node; // TODO: IS THIS ENOUGH OR DOES IT NEED TO BE CLONED?
+                    // SearchNode n = node; // TODO: IS THIS ENOUGH OR DOES IT NEED TO BE CLONED?
                     // TODO: CHECK IF THIS WORKS WITHOUT clonemethod in SN
 
-                    for (int i = 0; i<n.getState().getBoard().length; i++){
-                        for(int j =0; j<n.getState().getBoard()[i].length; j++){
-                            n.getState().getBoard()[i][j]  =board[i][j];
+                    for (int i = 0; i < n.getState().getBoard().length; i++) {
+                        for (int j = 0; j < n.getState().getBoard()[i].length; j++) {
+                            n.getState().getBoard()[i][j] = board[i][j];
                         }
                     }
-                    double probability =((value == 2) ? 0.9 : 0.1);
-                    ret  = expectimax(n, depth - 1, maximizing);
+                    double probability = ((value == 2) ? 0.9 : 0.1);
+                    ret = expectimax(n, depth - 1, maximizing);
 
-                    bestScore += ret.getHeuristicValue() *probability;
+                    bestScore += ret.getHeuristicValue() * probability;
                 }
 
 
             }
             bestScore = bestScore / empty.size();
-            ret = new ReturnValue(node,bestScore);
+            ret = new ReturnValue(node, bestScore);
 
             return ret;
 
@@ -242,42 +417,48 @@ public class MinMax {
     }
 
     // TODO: test if normal array is faster and check if score is updated
-    public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
+    public ArrayList<SearchNode> getMaxChildren(SearchNode parent) {
         ArrayList<SearchNode> returnArray = new ArrayList();// {new SearchNode(parent, SearchNode.LEFT),new SearchNode(parent,SearchNode.RIGHT), new SearchNode(parent,SearchNode.UP),new SearchNode(parent,SearchNode.DOWN)};
         SearchNode temp = new SearchNode(parent, Game.LEFT);
         temp.setState(game.mergeTilesLeft(temp.getState(), false));
-        if(temp.getState().isChanged()){
+        if (temp.getState().isChanged()) {
             returnArray.add(temp);
         }
         temp = new SearchNode(parent, Game.RIGHT);
         temp.setState(game.mergeTilesRight(temp.getState(), false));
-        if(temp.getState().isChanged()){
+        if (temp.getState().isChanged()) {
             returnArray.add(temp);
         }
 
         temp = new SearchNode(parent, Game.UP);
-        temp.setState(game.mergeTilesUp(temp.getState(),false));
-        if(temp.getState().isChanged()) {
+        temp.setState(game.mergeTilesUp(temp.getState(), false));
+        if (temp.getState().isChanged()) {
             returnArray.add(temp);
         }
         temp = new SearchNode(parent, Game.DOWN);
-        temp.setState(game.mergeTilesDown(temp.getState(),false));
+        temp.setState(game.mergeTilesDown(temp.getState(), false));
         if (temp.getState().isChanged()) {
             returnArray.add(temp);
         }
         return returnArray;
     }
 
-    public ArrayList getEmptyTiles(int[][] state){
+    public ArrayList getEmptyTiles(int[][] state) {
         return game.getEmptyTiles(state);
     }
-    public ArrayList<SearchNode> getMinChildren(SearchNode parent){
+
+    public ArrayList<SearchNode> getMinChildren(SearchNode parent) {
         int[][] gridval = parent.getGridValues();
-        ArrayList empty = getEmptyTiles(gridval);
+        ArrayList<Integer> empty = getEmptyTiles(gridval);
+        ArrayList a;
+
         ArrayList<SearchNode> sn = new ArrayList<>();
-        if(empty.size() >0) {
+        if (empty.size() > 0) {
             for (int i = 0; i < empty.size(); i++) {
-                int[] xy = game.i1Dto2D((int) empty.get(i));
+                if(empty.get(i)==null){
+                    System.out.println("EMPTY.geT(I) IS NULL: i: " + i + " sixze: " + empty.size());
+                }
+                int[] xy = game.i1Dto2D(empty.get(i));
                 int[][] newArray = new int[gridval.length][]; // fix 0? not fixed size?
                 int[][] newArray2 = new int[gridval.length][];
                 for (int j = 0; j < gridval.length; j++) {
@@ -298,16 +479,17 @@ public class MinMax {
                 SearchNode temp = new SearchNode(parent);
                 temp.setBoard(newArray);
                 temp.getState().addToEmptyTiles(1);
+                temp.setMovement(2);
                 sn.add(temp);
                 temp = new SearchNode(parent);
                 temp.setBoard(newArray2);
+                temp.setMovement(4);
                 temp.getState().addToEmptyTiles(1);
                 sn.add(temp);
             }
         }
 
         return sn;
-
 
 
     }

@@ -4,7 +4,7 @@ import AI.SearchNode;
 import Game.Game;
 public class Main {
 
-    public static int depth = 7; /// depth is 7 when 1024 + 256 + 128 + 64 +64
+    public static int depth = 4; /// depth is 7 when 1024 + 256 + 128 + 64 +64
 
     public static void main(String[] args) {
         Game twenty40eight = new Game(4,4);
