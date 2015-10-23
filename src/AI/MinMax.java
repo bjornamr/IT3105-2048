@@ -374,42 +374,24 @@ public class MinMax {
         } else {
             double bestScore = 0;
             ReturnValue ret = null;
-            ArrayList<Integer> empty = game.getEmptyTiles(node.getState().getBoard());
-            if (empty.size() == 0) {
-                return new ReturnValue(node, node.getHeuristicScore(game));
-            }
 
-            int[] possibleValues = new int[]{2, 4};
-
-            for (int emptyInd = 0; emptyInd < empty.size(); emptyInd++) {
-                int[] index = game.i1Dto2D(empty.get(emptyInd));
-                for (int value : possibleValues) {
-                    SearchNode n = null;
-                    try {
-                        n = node.clone();
-                    } catch (CloneNotSupportedException e) {
-                        System.out.println("Could not clone node in expectimax");
-                    }
-                    int[][] board = n.getState().getBoard();
-                    board[index[0]][index[1]] = value;
-                    // SearchNode n = node; // TODO: IS THIS ENOUGH OR DOES IT NEED TO BE CLONED?
-                    // TODO: CHECK IF THIS WORKS WITHOUT clonemethod in SN
-
-                    for (int i = 0; i < n.getState().getBoard().length; i++) {
-                        for (int j = 0; j < n.getState().getBoard()[i].length; j++) {
-                            n.getState().getBoard()[i][j] = board[i][j];
-                        }
-                    }
-                    double probability = ((value == 2) ? 0.9 : 0.1);
-                    ret = expectimax(n, depth - 1, maximizing);
-
-                    bestScore += ret.getHeuristicValue() * probability;
+            for(SearchNode child : getMinChildren(node)){
+                double nodeValue = expectimax(child, depth-1, true).getHeuristicValue();
+                double probability = 0.9;
+                if(child.getMovement() == 4){
+                    probability = 0.1;
                 }
-
-
+                nodeValue = nodeValue * probability;
+                if(nodeValue>bestScore){
+                    ret = new ReturnValue(child,nodeValue);
+                    bestScore = nodeValue;
+                }
             }
-            bestScore = bestScore / empty.size();
-            ret = new ReturnValue(node, bestScore);
+            if(ret==null){
+                return new ReturnValue(null, bestScore);
+            }
+
+
 
             return ret;
 

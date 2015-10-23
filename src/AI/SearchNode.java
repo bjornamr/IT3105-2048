@@ -90,20 +90,20 @@ public class SearchNode {
         weightMatrix1[0][2] = 16384;
         weightMatrix1[0][3] = 8192;
 
-        weightMatrix1[1][0] = 512;
-        weightMatrix1[1][1] = 1024;
-        weightMatrix1[1][2] = 2048;
-        weightMatrix1[1][3] = 4096;
+        weightMatrix1[1][3] = 512;
+        weightMatrix1[1][2] = 1024;
+        weightMatrix1[1][1] = 2048;
+        weightMatrix1[1][0] = 4096;
 
         weightMatrix1[2][3] = 32;
         weightMatrix1[2][2] = 64;
         weightMatrix1[2][1] = 128;
         weightMatrix1[2][0] = 256;
 
-        weightMatrix1[3][0] = 2;
-        weightMatrix1[3][1] = 4;
-        weightMatrix1[3][2] = 8;
-        weightMatrix1[3][3] = 16;
+        weightMatrix1[3][3] = 2;
+        weightMatrix1[3][2] = 4;
+        weightMatrix1[3][1] = 8;
+        weightMatrix1[3][0] = 16;
 
 
 
@@ -317,7 +317,7 @@ public class SearchNode {
 
 
         //System.out.println(getHeuristicWeightScore()+ " - " + Math.log(getHeuristicWeightScore() * state.getEmptyTiles()) + " - " + -getClusteringScore());
-        double score = (getHeuristicWeightScore()) + (Math.log(state.getScore())/(Math.log(3)))*state.getEmptyTiles();
+        double score = (getHeuristicWeightScore()) ;
         if(Double.isInfinite(score)){
             score = getHeuristicWeightScore();
         }
