@@ -144,6 +144,7 @@ public class MinMax {
                 System.out.println("GAME OVER, total moves: " + moves);
 
             }
+
             currentBestValue = ret.getNode();
             while (currentBestValue.getParent().getParent() != null) {
                 currentBestValue = currentBestValue.getParent();
@@ -208,7 +209,7 @@ public class MinMax {
                     }
                 }
                 if(ret==null){
-                    return new ReturnValue(null, bestScore);
+                    return new ReturnValue(node, bestScore);
                 }
 
 
@@ -352,7 +353,8 @@ public class MinMax {
      */
 
     public ReturnValue expectimax(SearchNode node, int depth, boolean maximizing) {
-        if (depth == 0 || new SearchNode(node, 0).isGameOver()) {
+
+        if (depth == 0) {
             return new ReturnValue(node, node.getHeuristicScore(game));
         }
         if (maximizing) {
@@ -369,31 +371,34 @@ public class MinMax {
                     //System.out.println(bestValue + " " + currentBestValue.getMovement());
                 }
             }
+            if(ret == null){
+                return new ReturnValue(node, bestValue);
+            }
             return ret;
 
         } else {
             double bestScore = 0;
             ReturnValue ret = null;
-
-            for(SearchNode child : getMinChildren(node)){
+            ArrayList<SearchNode> newStates = getMinChildren(node);
+            for(SearchNode child : newStates){
                 double nodeValue = expectimax(child, depth-1, true).getHeuristicValue();
                 double probability = 0.9;
-                if(child.getMovement() == 4){
-                    probability = 0.1;
-                }
-                nodeValue = nodeValue * probability;
-                if(nodeValue>bestScore){
+
+                nodeValue = (nodeValue * probability);
+                bestScore += nodeValue;
+                currentBestValue = node;
+               /* if(nodeValue>bestScore){
                     ret = new ReturnValue(child,nodeValue);
                     bestScore = nodeValue;
-                }
-            }
-            if(ret==null){
-                return new ReturnValue(null, bestScore);
+                }*/
             }
 
+            if(newStates.size()==0){
+                return new ReturnValue(node, Double.MAX_VALUE);
+            }
+            bestScore = bestScore/newStates.size();
 
-
-            return ret;
+            return new ReturnValue(node, bestScore);
 
         }
     }
@@ -432,14 +437,11 @@ public class MinMax {
     public ArrayList<SearchNode> getMinChildren(SearchNode parent) {
         int[][] gridval = parent.getGridValues();
         ArrayList<Integer> empty = getEmptyTiles(gridval);
-        ArrayList a;
 
         ArrayList<SearchNode> sn = new ArrayList<>();
         if (empty.size() > 0) {
             for (int i = 0; i < empty.size(); i++) {
-                if(empty.get(i)==null){
-                    System.out.println("EMPTY.geT(I) IS NULL: i: " + i + " sixze: " + empty.size());
-                }
+
                 int[] xy = game.i1Dto2D(empty.get(i));
                 int[][] newArray = new int[gridval.length][]; // fix 0? not fixed size?
                 int[][] newArray2 = new int[gridval.length][];
@@ -461,11 +463,11 @@ public class MinMax {
                 SearchNode temp = new SearchNode(parent);
                 temp.setBoard(newArray);
                 temp.getState().addToEmptyTiles(1);
-                temp.setMovement(2);
+                //temp.setMovement(2);
                 sn.add(temp);
                 temp = new SearchNode(parent);
                 temp.setBoard(newArray2);
-                temp.setMovement(4);
+                //temp.setMovement(4);
                 temp.getState().addToEmptyTiles(1);
                 sn.add(temp);
             }
