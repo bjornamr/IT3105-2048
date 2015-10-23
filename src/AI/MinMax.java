@@ -390,14 +390,14 @@ public class MinMax {
                     probability = 0.1;
                 }
                 nodeValue = (nodeValue * probability);
-                if(bestScore>nodeValue) {
+                /*if(bestScore>nodeValue) {
                     bestScore = nodeValue;
                     currentBestValue = node;
-                }
-                if(nodeValue>bestScore){
+                }*/
+                //if(nodeValue>bestScore){
                     ret = new ReturnValue(child,nodeValue);
                     bestScore += nodeValue;
-                }
+                //}
             }
 
             if(newStates.size()==0){
