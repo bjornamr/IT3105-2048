@@ -173,7 +173,10 @@ public class MinMax {
         }
 
         public ReturnValue expectimax(SearchNode node, int depth, boolean maximizing) {
-            if (depth == 0 || new SearchNode(node, 0).isGameOver()) {
+            if(new SearchNode(node,0).isGameOver()){
+                return new ReturnValue(node, Double.MIN_VALUE);
+            }
+            if (depth == 0) {
                 return new ReturnValue(node, node.getHeuristicScore(game));
             }
             if (maximizing) {
@@ -383,20 +386,24 @@ public class MinMax {
             for(SearchNode child : newStates){
                 double nodeValue = expectimax(child, depth-1, true).getHeuristicValue();
                 double probability = 0.9;
-
+                if(child.getMovement()==4){
+                    probability = 0.1;
+                }
                 nodeValue = (nodeValue * probability);
-                bestScore += nodeValue;
-                currentBestValue = node;
-               /* if(nodeValue>bestScore){
-                    ret = new ReturnValue(child,nodeValue);
+                if(bestScore>nodeValue) {
                     bestScore = nodeValue;
-                }*/
+                    currentBestValue = node;
+                }
+                if(nodeValue>bestScore){
+                    ret = new ReturnValue(child,nodeValue);
+                    bestScore += nodeValue;
+                }
             }
 
             if(newStates.size()==0){
                 return new ReturnValue(node, Double.MAX_VALUE);
             }
-            bestScore = bestScore/newStates.size();
+            bestScore = bestScore/(newStates.size());
 
             return new ReturnValue(node, bestScore);
 
@@ -463,11 +470,11 @@ public class MinMax {
                 SearchNode temp = new SearchNode(parent);
                 temp.setBoard(newArray);
                 temp.getState().addToEmptyTiles(1);
-                //temp.setMovement(2);
+                temp.setMovement(2);
                 sn.add(temp);
                 temp = new SearchNode(parent);
                 temp.setBoard(newArray2);
-                //temp.setMovement(4);
+                temp.setMovement(4);
                 temp.getState().addToEmptyTiles(1);
                 sn.add(temp);
             }
