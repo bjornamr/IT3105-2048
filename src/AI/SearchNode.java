@@ -374,7 +374,7 @@ public class SearchNode {
         if(isHighestValueInCorner()){
             weight *= 1.7;
         }
-        double empty = state.getEmptyTiles() * 23 * Math.log(getHeuristicWeightScore());
+        double empty = state.getEmptyTiles() *20 * Math.sqrt(getHeuristicWeightScore());
         double clustering = -getClusteringScore() * 1;
         double smoothness = getSmoothness() * 0.7;
         //score += weight + empty + clustering;
@@ -386,7 +386,6 @@ public class SearchNode {
         if (state.getScore() > 1000) {
             //System.out.println(weight + " + " + empty + " + " + clustering + " + " + smoothness + " = " + score);
         }
-        score = weight;
 
         if (Double.isNaN(score)) {
             score = 0;
