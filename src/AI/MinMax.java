@@ -16,18 +16,24 @@ import java.util.Map;
 public class MinMax {
     private Game game;
     private SearchNode currentBestValue;
-
+    private int currentDepth;
+    private boolean depthChanged = false;
 
     public MinMax(Game game) {
         this.game = game;
+    }
+    public void setDepth(int depth){
+        this.currentDepth = depth;
     }
 
     public void start(SearchNode startNode, int depth) {
         int moves = 0;
         SearchNode currentNode = startNode;
-        int currentDepth = depth;
+        setDepth(depth);
+
         Date time = new Date();
         while (true) {
+            depthChanged = false;
             try {
                 //Thread.sleep(300);
             } catch (Exception e) {
@@ -134,7 +140,13 @@ public class MinMax {
                 return;
             }*/
 
+            if(currentNode.getState().getEmptyTiles() <4){
+                setDepth(8);
+            }else {
+                setDepth(6);
+            }
             ret = expectimax(currentNode, currentDepth, true);
+
             //ReturnValue ret = expectimax(currentNode,currentDepth,true);
             time = new Date();
             long currentTime = time.getTime() - oldTime;
@@ -147,11 +159,11 @@ public class MinMax {
             }
 
             currentBestValue = ret.getNode();
-            {
+
                 while (currentBestValue.getParent().getParent() != null) {
                     currentBestValue = currentBestValue.getParent();
                 }
-            }
+
             //System.out.println("Current movement: " + currentBestValue.getMovement());
             game.movement(currentBestValue.getMovement());
             moves++;
@@ -176,7 +188,7 @@ public class MinMax {
         }
 
         public ReturnValue expectimax(SearchNode node, int depth, boolean maximizing) {
-            if(new SearchNode(node,0).isGameOver()){
+            if (new SearchNode(node, 0).isGameOver()) {
                 return new ReturnValue(node, Double.MIN_VALUE);
             }
             if (depth == 0) {
@@ -196,28 +208,29 @@ public class MinMax {
                         //System.out.println(bestValue + " " + currentBestValue.getMovement());
                     }
                 }
+                if(ret==null){
+                }
                 return ret;
 
             } else {
                 double bestScore = 0;
                 ReturnValue ret = null;
 
-                for(SearchNode child : getMinChildren(node)){
-                    double nodeValue = expectimax(child, depth-1, true).getHeuristicValue();
+                for (SearchNode child : getMinChildren(node)) {
+                    double nodeValue = expectimax(child, depth - 1, true).getHeuristicValue();
                     double probability = 0.9;
-                    if(child.getMovement() == 4){
+                    if (child.getMovement() == 4) {
                         probability = 0.1;
                     }
                     nodeValue = nodeValue * probability;
-                    if(nodeValue>bestScore){
-                        ret = new ReturnValue(child,nodeValue);
+                    if (nodeValue > bestScore) {
+                        ret = new ReturnValue(child, nodeValue);
                         bestScore = nodeValue;
                     }
                 }
-                if(ret==null){
+                if (ret == null) {
                     return new ReturnValue(node, bestScore);
                 }
-
 
 
                 return ret;
@@ -362,12 +375,14 @@ public class MinMax {
         if (depth == 0) {
             return new ReturnValue(node, node.getHeuristicScore(game));
         }
+
         if (maximizing) {
+
             double bestValue = Double.MIN_VALUE;
             ReturnValue ret = null;
             for (SearchNode child : getMaxChildren(node)) {
-                ReturnValue temp =  expectimax(child, depth - 1, false);
-                if(temp == null || temp.getNode() == null){
+                ReturnValue temp = expectimax(child, depth - 1, false);
+                if (temp == null || temp.getNode() == null) {
                     continue;
                 }
                 double nodeValue = temp.getHeuristicValue();
@@ -379,25 +394,26 @@ public class MinMax {
                     //System.out.println(bestValue + " " + currentBestValue.getMovement());
                 }
             }
-            if(ret == null){
-                return null;
+            if (ret == null) {
+                return new ReturnValue(node, node.getState().getScore() * -1);
             }
 
             return ret;
 
         } else {
+
             double bestScore = 0;
             ReturnValue ret = null;
             ArrayList<SearchNode> newStates = getMinChildren(node);
 
-            for(SearchNode child : newStates){
-                ret = expectimax(child, depth-1, true);
-                if(ret == null || ret.getNode() == null){
+            for (SearchNode child : newStates) {
+                ret = expectimax(child, depth - 1, true);
+                if (ret == null || ret.getNode() == null) {
                     continue;
                 }
                 double nodeValue = ret.getHeuristicValue();
                 double probability = 0.9;
-                if(child.getMovement()==4){
+                if (child.getMovement() == 4) {
                     probability = 0.1;
                 }
                 nodeValue = (nodeValue * probability);
@@ -406,27 +422,47 @@ public class MinMax {
                     currentBestValue = node;
                 }*/
                 //if(nodeValue>bestScore){
-                    ret = new ReturnValue(child,nodeValue);
-                    bestScore += nodeValue;
+                ret = new ReturnValue(child, nodeValue);
+                bestScore += nodeValue;
                 //}
             }
 
-            if(newStates.size()==0){
+            if (newStates.size() == 0) {
                 return null;
             }
-            bestScore = bestScore/(newStates.size());
+            bestScore = bestScore / (newStates.size());
 
             return new ReturnValue(node, bestScore);
 
         }
     }
 
+    public boolean isTheSame(int[][] array1, int[][] array2){
+        for(int i = 0;i<array1.length;i++){
+            for(int j = 0;j<array1[i].length;j++){
+                if(array1[i][j]!=array2[i][j]){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     // TODO: test if normal array is faster and check if score is updated
-    public ArrayList<SearchNode> getMaxChildren(SearchNode parent) {
+    public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
         ArrayList<SearchNode> returnArray = new ArrayList();// {new SearchNode(parent, SearchNode.LEFT),new SearchNode(parent,SearchNode.RIGHT), new SearchNode(parent,SearchNode.UP),new SearchNode(parent,SearchNode.DOWN)};
         SearchNode temp = new SearchNode(parent, Game.LEFT);
+        int[][] board = new int[0][];
+        try {
+            board = temp.clone().getState().getBoard();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
         temp.setState(game.mergeTilesLeft(temp.getState(), false));
         if (temp.getState().isChanged()) {
+            if(isTheSame(board,temp.getState().getBoard())){
+                //System.out.println("YESSSSS");
+            }
             returnArray.add(temp);
         }
 

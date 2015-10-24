@@ -87,26 +87,30 @@ public class SearchNode {
         weightMatrix1[0][3] = 8192;*/
 
 
+        //MAIN
+
+
+
         weightMatrix1 = new double[4][4];
         weightMatrix1[0][0] = 65536;
         weightMatrix1[0][1] = 32768;
         weightMatrix1[0][3] = 16384;
         weightMatrix1[0][2] = 8192;
 
-        weightMatrix1[1][0] = 4096;
-        weightMatrix1[1][1] = 2048;
-        weightMatrix1[1][2] = 1024;
-        weightMatrix1[1][3] = 512;
+        weightMatrix1[1][3] = 4096;
+        weightMatrix1[1][2] = 2048;
+        weightMatrix1[1][1] = 1024;
+        weightMatrix1[1][0] = 512;
 
-        weightMatrix1[2][0] = 256;
-        weightMatrix1[2][1] = 128;
-        weightMatrix1[2][2] = 64;
-        weightMatrix1[2][3] = 32;
+        weightMatrix1[2][3] = 256;
+        weightMatrix1[2][2] = 128;
+        weightMatrix1[2][1] = 64;
+        weightMatrix1[2][0] = 32;
 
-        weightMatrix1[3][0] = 16;
-        weightMatrix1[3][1] = 8;
-        weightMatrix1[3][2] = 4;
-        weightMatrix1[3][3] = 2;
+        weightMatrix1[3][3] = 16;
+        weightMatrix1[3][2] = 8;
+        weightMatrix1[3][1] = 4;
+        weightMatrix1[3][0] = 2;
 
 
 
@@ -370,21 +374,21 @@ public class SearchNode {
         //System.out.println("MONO: " + getMonotonicity(3));
         // double score = 2000 + (27*state.getEmptyTiles())+(getMonotonicity()*4.7) + (heur_score(1.1)*(-1.5)) + (getSmoothness()*3.5);
         double score = 0;
-        double weight = getHeuristicWeightScore() * 4;
+        double weight = getHeuristicWeightScore() * 2.2;
         if(isHighestValueInCorner()){
             weight *= 1.7;
         }
         double empty = state.getEmptyTiles() *20 * Math.sqrt(getHeuristicWeightScore());
-        double clustering = -getClusteringScore() * 1;
-        double smoothness = getSmoothness() * 0.7;
+        double clustering = -getClusteringScore() * 1.7;
+        double smoothness = getSmoothness() * 2.7;
         //score += weight + empty + clustering;
         score = weight;
-        score += empty * 3;
-        score += clustering + smoothness;
+        score += empty;
+        score += clustering;
         //score = (state.getScore()+Math.log(state.getScore())*state.getEmptyTiles() -getClusteringScore());
         //score = weight;
-        if (state.getScore() > 1000) {
-            //System.out.println(weight + " + " + empty + " + " + clustering + " + " + smoothness + " = " + score);
+        if (state.getScore() > 18000) {
+            //System.out.println(weight + " + " + (empty*3) + " + " + clustering + " + " + smoothness + " = " + score);
         }
 
         if (Double.isNaN(score)) {

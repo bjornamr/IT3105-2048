@@ -25,7 +25,7 @@ public class GameState implements Cloneable{
 
     public GameState(GameState copy){
         this.score = copy.score;
-        this.changed = copy.changed;
+        this.changed = false;
         this.emptyTiles = copy.emptyTiles;
         this.board = new int[copy.board.length][];
         for(int i = 0;i<board.length;i++){
@@ -35,6 +35,8 @@ public class GameState implements Cloneable{
             }
         }
     }
+
+
 
     public int getEmptyTiles() {
         return emptyTiles;
@@ -58,9 +60,11 @@ public class GameState implements Cloneable{
 
     public void setTile(int x, int y, int value){
         board[x][y] = value;
+
     }
 
     public void removeTile(int x, int y){
+
         board[x][y] = 0;
     }
 
