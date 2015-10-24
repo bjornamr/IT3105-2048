@@ -45,7 +45,7 @@ public class GameState implements Cloneable{
     }
 
     public void addToEmptyTiles(int amount){
-        emptyTiles+= amount;
+        this.emptyTiles+= amount;
     }
 
     public int[][] getBoard() {

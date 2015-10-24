@@ -80,10 +80,10 @@ public class Game implements MyListener {
     }
 
     public ArrayList<Integer> getEmptyTiles(int[][] gridValues) {  // getting all the empty tiles
-        emptyTiles.clear();
+        ArrayList<Integer> emptyTiles = new ArrayList<>();
         for (int x = 0; x < gridValues.length; x++) {
             for (int y = 0; y < gridValues[x].length; y++) {
-                if (isEmpty(x, y)) emptyTiles.add(i2Dto1D(x, gridValues.length, y));
+                if (isEmpty(x, y, gridValues)) emptyTiles.add(i2Dto1D(x, gridValues.length, y));
             }
         }
         return emptyTiles;
@@ -153,7 +153,7 @@ public class Game implements MyListener {
                     state.setTile(x,y,(lastValue * 2));
                     state.removeTile(j,i);
                     state.addToScore(lastValue*2);
-                    state.setEmptyTiles(state.getEmptyTiles() + 1);
+                    state.addToEmptyTiles(1);
                     lastValue = 0;
                     state.setChanged(true);
 
@@ -191,7 +191,7 @@ public class Game implements MyListener {
                     state.setTile(x,y,(lastValue * 2));
                     state.removeTile(j,i);
                     state.addToScore(lastValue * 2);
-                    state.setEmptyTiles(state.getEmptyTiles()+1);
+                    state.addToEmptyTiles(1);
                     lastValue = 0;
                     state.setChanged(true);
                 }
@@ -229,7 +229,7 @@ public class Game implements MyListener {
                     state.setTile(x,y,(lastValue * 2));
                     state.removeTile(i, j);
                     state.addToScore(lastValue * 2);
-                    state.setEmptyTiles(state.getEmptyTiles()+1);
+                    state.addToEmptyTiles(1);
                     lastValue = 0;
                     state.setChanged(true);
                 }
@@ -267,7 +267,7 @@ public class Game implements MyListener {
                     state.setTile(x,y,(lastValue * 2));
                     state.removeTile(i,j);
                     state.addToScore(lastValue * 2);
-                    state.setEmptyTiles(state.getEmptyTiles()+1);
+                    state.addToEmptyTiles(1);
                     lastValue = 0;
                     state.setChanged(true);
                 }
@@ -403,7 +403,7 @@ public class Game implements MyListener {
         return Math.random() < 0.9 ? 2 : 4; // generating 2s 90 perecent of the time.
     }
 
-    public boolean isEmpty(int x, int y) {
+    public boolean isEmpty(int x, int y, int[][] board) {
         return board[x][y] == 0;
     }
 
