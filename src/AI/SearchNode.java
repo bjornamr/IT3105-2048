@@ -248,10 +248,6 @@ public class SearchNode {
                 if (state.getBoard()[i][j] == 0) {
                     continue; //ignore empty cells
                 }
-
-                //clusteringScore-=boardArray[i][j];
-
-                //for every pixel find the distance from each neightbors
                 int numOfNeighbors = 0;
                 int sum = 0;
                 for (int k : neighbors) {
