@@ -241,9 +241,9 @@ public class SearchNode {
     private int getClusteringScore() {
         int clusteringScore = 0;
 
-        int[] neighbors = {-1, 0, 1};
+        int[] neighbors = {-1, 0, 1}; // neighbouring tiles represented as values
 
-        for (int i = 0; i < state.getBoard().length; ++i) {
+        for (int i = 0; i < state.getBoard().length; ++i) {         //iterating through the 2D board
             for (int j = 0; j < state.getBoard().length; ++j) {
                 if (state.getBoard()[i][j] == 0) {
                     continue; //ignore empty cells
@@ -252,24 +252,24 @@ public class SearchNode {
                 int sum = 0;
                 for (int k : neighbors) {
                     int x = i + k;
-                    if (x < 0 || x >= state.getBoard().length) {
+                    if (x < 0 || x >= state.getBoard().length) { // if x is outside of bounds jump to next
                         continue;
                     }
                     for (int l : neighbors) {
                         int y = j + l;
-                        if (y < 0 || y >= state.getBoard().length) {
+                        if (y < 0 || y >= state.getBoard().length) { // if y is outside bounds jump to next
                             continue;
                         }
 
                         if (state.getBoard()[x][y] > 0) {
                             ++numOfNeighbors;
-                            sum += Math.abs(state.getBoard()[i][j] - state.getBoard()[x][y]);
+                            sum += Math.abs(state.getBoard()[i][j] - state.getBoard()[x][y]); //summing the abs of neighbours
                         }
 
                     }
                 }
 
-                clusteringScore += sum / numOfNeighbors;
+                clusteringScore += sum / numOfNeighbors;        // clustering is the sum of neighbours / number of neighbours
             }
         }
         return clusteringScore;
