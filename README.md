@@ -1,12 +1,7 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
 ### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+This repo is for solving 2048 with either minimax / expectimax in IT3105. We ended up with using expectimax.
 
 ### How do I get set up? ###
 
