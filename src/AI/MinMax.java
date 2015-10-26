@@ -25,7 +25,12 @@ public class MinMax {
     public void setDepth(int depth){
         this.currentDepth = depth;
     }
+    /*
+    Starting game and running it.
 
+    The depth is here set dynamicly based on number of empty tiles.
+    It is searching using the expectimax.
+     */
     public void start(SearchNode startNode, int depth) {
         int moves = 0;
         SearchNode currentNode = startNode;
@@ -40,105 +45,8 @@ public class MinMax {
 
             }
             long oldTime = time.getTime();
-
-            //currentBestValue = minMax(currentNode, depth, true).getNode();'
-            /*int emptyTiles = game.getEmptyTiles(game.getBoardValues()).size();
-            if(emptyTiles>5){
-                currentDepth=depth;
-            }else{
-                currentDepth = depth+2;
-            }*/
             ReturnValue ret = null;
-            /*ArrayList<SearchNode> startingMoves = getMaxChildren(currentNode);
-            if (startingMoves.size() == 4) {
-                TreeThread thread1 = new TreeThread(startingMoves.get(0), currentDepth, false, );
-                TreeThread thread2 = new TreeThread(startingMoves.get(1), currentDepth, false, game);
-                TreeThread thread3 = new TreeThread(startingMoves.get(2), currentDepth, false, game);
-                TreeThread thread4 = new TreeThread(startingMoves.get(3), currentDepth, false, game);
 
-                thread1.start();
-                thread2.start();
-                thread3.start();
-                thread4.start();
-
-                try {
-                    thread1.join();
-                    thread2.join();
-                    thread3.join();
-                    thread4.join();
-                } catch (InterruptedException e) {
-                    System.out.println("EXCEPTION");
-                }
-                ret = thread1.getValues();
-                if (thread2.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
-                    ret = thread2.getValues();
-                }
-                if (thread3.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
-                    ret = thread3.getValues();
-                }
-                if (thread4.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
-                    ret = thread4.getValues();
-                }
-
-            } else if (startingMoves.size() == 3) {
-                TreeThread thread1 = new TreeThread(startingMoves.get(0), currentDepth, false, game);
-                TreeThread thread2 = new TreeThread(startingMoves.get(1), currentDepth, false, game);
-                TreeThread thread3 = new TreeThread(startingMoves.get(2), currentDepth, false, game);
-
-                thread1.start();
-                thread2.start();
-                thread3.start();
-
-                try {
-                    thread1.join();
-                    thread2.join();
-                    thread3.join();
-                } catch (InterruptedException e) {
-                    System.out.println("EXCEPTION");
-                }
-                ret = thread1.getValues();
-                if (thread2.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
-                    ret = thread2.getValues();
-                }
-                if (thread3.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
-                    ret = thread3.getValues();
-                }
-
-            }else if(startingMoves.size() == 2){
-                TreeThread thread1 = new TreeThread(startingMoves.get(0), currentDepth, false, game);
-                TreeThread thread2 = new TreeThread(startingMoves.get(1), currentDepth, false, game);
-
-                thread1.start();
-                thread2.start();
-
-                try {
-                    thread1.join();
-                    thread2.join();
-                } catch (InterruptedException e) {
-                    System.out.println("EXCEPTION");
-                }
-                ret = thread1.getValues();
-                if (thread2.getValues().getHeuristicValue() > ret.getHeuristicValue()) {
-                    ret = thread2.getValues();
-                }
-
-            }else if(startingMoves.size() == 1){
-                TreeThread thread1 = new TreeThread(startingMoves.get(0), currentDepth, false, game);
-
-                thread1.start();
-
-                try {
-                    thread1.join();
-                } catch (InterruptedException e) {
-                    System.out.println("EXCEPTION");
-                }
-                ret = thread1.getValues();
-
-            }else{
-                System.out.println("GAME OVER");
-                System.out.println("TOTAL MOVES: " + moves);
-                return;
-            }*/
 
             if(currentNode.getState().getEmptyTiles() <4){
                 setDepth(6);
@@ -249,7 +157,12 @@ public class MinMax {
     }
 
 
-    /// Start should be alpha = -inf beta=inf
+    ///
+    /*
+     Start should be alpha = -inf beta=inf
+    Minmax with alpha beta pruning
+    Alternates between max and min, where max is used when maximixing(the AI)
+     */
     public ReturnValue alphabeta(SearchNode node, int depth, double alpha, double beta, boolean maximizing) {
         if (depth == 0 || new SearchNode(node, 0).isGameOver()) {
             return new ReturnValue(node, node.getHeuristicScore(game));
@@ -310,7 +223,9 @@ public class MinMax {
         }
 
     }
-
+    /*
+    Minimax without pruning
+     */
 
     public ReturnValue minMax(SearchNode node, int depth, boolean maximizing) {
         if (depth == 0 || new SearchNode(node, 0).isGameOver()) {
@@ -350,32 +265,20 @@ public class MinMax {
     }
 
     /*
-    function expectiminimax(node, depth)
-   ## if node is a terminal node or depth = 0
-    ##    return the heuristic value of node
-    if the adversary is to play at node
-        // Return value of minimum-valued child node
-        let ? := +?
-        foreach child of node
-            ? := min(?, expectiminimax(child, depth-1))
-    else if we are to play at node
-        // Return value of maximum-valued child node
-        let ? := -?
-        foreach child of node
-            ? := max(?, expectiminimax(child, depth-1))
-    else if random event at node
-        // Return weighted average of all child nodes' values
-        let ? := 0
-        foreach child of node
-            ? := ? + (Probability[child] * expectiminimax(child, depth-1))
-    return ?
-     */
+    Expectimax without pruning.
 
+    Output: ReturnValue(SearchNode,heuristic/)
+    It can search a number of depth.
+
+    It stops when depth = 0
+     */
     public ReturnValue expectimax(SearchNode node, int depth, boolean maximizing) {
         if (depth == 0) {
             return new ReturnValue(node, node.getHeuristicScore(game));
         }
-
+        /*
+        Calculates the best heuristic and returns object with best searchnode and heurstic
+         */
         if (maximizing) {
 
             double bestValue = Double.MIN_VALUE;
@@ -399,7 +302,12 @@ public class MinMax {
             }
 
             return ret;
+            /*
+            Calculates the posibility times the heuristic of the state of the board.
+            probability is 0.9 for 2 and 0.1 for 4.
 
+            returns the one with highest heurstic *probability.
+             */
         } else {
 
             double bestScore = 0;
@@ -436,7 +344,9 @@ public class MinMax {
 
         }
     }
-
+    /*
+    Checks if two boards is the same.
+     */
     public boolean isTheSame(int[][] array1, int[][] array2){
         for(int i = 0;i<array1.length;i++){
             for(int j = 0;j<array1[i].length;j++){
@@ -449,6 +359,10 @@ public class MinMax {
     }
 
     // TODO: test if normal array is faster and check if score is updated
+    /*
+    Returns array of Searchnodes that can take left/ right/up/down.
+    Just the ones that actually is true.
+     */
     public ArrayList<SearchNode> getMaxChildren(SearchNode parent){
         ArrayList<SearchNode> returnArray = new ArrayList();// {new SearchNode(parent, SearchNode.LEFT),new SearchNode(parent,SearchNode.RIGHT), new SearchNode(parent,SearchNode.UP),new SearchNode(parent,SearchNode.DOWN)};
         SearchNode temp = new SearchNode(parent, Game.LEFT);
@@ -484,11 +398,15 @@ public class MinMax {
         }
         return returnArray;
     }
-
+    /*
+    Returns empty tiles of the current state.
+     */
     public ArrayList getEmptyTiles(int[][] state) {
         return game.getEmptyTiles(state);
     }
-
+    /*
+    Adds 2s and 4s to all empty places and returns arraylist with it.
+     */
     public ArrayList<SearchNode> getMinChildren(SearchNode parent) {
         int[][] gridval = parent.getGridValues();
         ArrayList<Integer> empty = getEmptyTiles(gridval);

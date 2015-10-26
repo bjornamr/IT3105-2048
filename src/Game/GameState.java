@@ -8,21 +8,27 @@ public class GameState implements Cloneable{
     private int score;
     private boolean changed;
     private int emptyTiles;
-
+    /*
+    Game state with the board, score and a boolean that says if the state was change or not
+     */
     public GameState(int[][] board, int score, boolean changed){
         this.board = board;
         this.score = score;
         this.changed = changed;
 
     }
-
+    /*
+    Game state with the board, score, if changed between states and number of empty tiles.
+     */
     public GameState(int[][] board, int score, boolean changed, int emptyTiles){
         this.board = board;
         this.score = score;
         this.changed = changed;
         this.emptyTiles = emptyTiles;
     }
-
+    /*
+    Constructor for copying states.
+     */
     public GameState(GameState copy){
         this.score = copy.score;
         this.changed = false;
@@ -43,8 +49,10 @@ public class GameState implements Cloneable{
     }
 
     public void setEmptyTiles(int emptyTiles) {
+
         this.emptyTiles = emptyTiles;
     }
+
 
     public void addToEmptyTiles(int amount){
         this.emptyTiles+= amount;

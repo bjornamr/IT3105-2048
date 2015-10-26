@@ -23,32 +23,32 @@ public class Game implements MyListener {
 
     private static final String WIN_GAME = "You WON! Tile is 2048";
     private static final String LOSE_GAME = "You lost. Retry by pressing -R-";
-    public static final int UP = 38;
-    public static final int DOWN = 40;
-    public static final int RIGHT = 39;
-    public static final int LEFT = 37;
+    public static final int UP = 38;                                                // Keyevent value for keys
+    public static final int DOWN = 40;                                              // Keyevent value for keys
+    public static final int RIGHT = 39;                                             // Keyevent value for keys
+    public static final int LEFT = 37;                                              // Keyevent value for keys
 
-    private int width;
-    private int height;
+    private int width;                                                              // width for array / game
+    private int height;                                                             // height for array / game
 
     private final int GOAL = 2048;
 
-    private ArrayList<Integer> emptyTiles = new ArrayList<>();
+    private ArrayList<Integer> emptyTiles = new ArrayList<>();                      // arraylist to save index of empty Tiles.
     private Random random = new Random();
 
     private int[][] board; // Values
     private GUI frame;
 
     public Game(int x, int y) {
-        this.width = x;
+        this.width = x;                                                         // Sets width and height of game
         this.height = y;
 
-        frame = new GUI(x, y);
-        frame.addListener(this);
+        frame = new GUI(x, y);                                                  // makes frame.
+        frame.addListener(this);                                                // adds listener to game.
 
         this.board = new int[x][y]; // setting size of grid.
 
-        score = 0;
+        score = 0;                                                          // score
         frame.setSize(800, 800);
         frame.setTileSize(x, y, 200, 200);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -60,9 +60,9 @@ public class Game implements MyListener {
 
     }
 
-    public void newGame() {
+    public void newGame() {                                             // starts with two empty tiles in game
 
-        chooseEmptySpot();
+        chooseEmptySpot();                                              // random generated place of empty tiles.
         chooseEmptySpot();
         score = 0;
 
@@ -78,7 +78,9 @@ public class Game implements MyListener {
 
 
     }
-
+    /*
+    Gets emptytiles and saves it into arraylist. Converts the x,y values to 1D index
+     */
     public ArrayList<Integer> getEmptyTiles(int[][] gridValues) {  // getting all the empty tiles
         ArrayList<Integer> emptyTiles = new ArrayList<>();
         for (int x = 0; x < gridValues.length; x++) {
@@ -89,10 +91,15 @@ public class Game implements MyListener {
         return emptyTiles;
     }
 
-
+    /*
+    Converting between indexes - 2D to 1D
+     */
     public int i2Dto1D(int x, int rowlength, int y) {
         return (x * board.length) + y; // Indexes from 2D to 1D
     }
+    /*
+    Converting between indexes - 1D to 2D
+     */
 
     public int[] i1Dto2D(int index) {
         int[] indexes = new int[2];
@@ -100,13 +107,17 @@ public class Game implements MyListener {
         indexes[1] = index % height; // Y value
         return indexes;
     }
-
+    /*
+    Sets tile inside 2D integer array + paints on GUI.
+     */
 
     public void setTile(int x, int y, int number) {
         frame.setTileText(x, y, Integer.toString(number));  // color based on number.
         board[x][y] = number; // setting number to grid
     }
-
+    /*
+    Removes tiles from int array and GUI
+     */
 
     public void removeTile(int x, int y) {
         frame.removeTileText(x, y);
@@ -116,13 +127,17 @@ public class Game implements MyListener {
     public int[][] getBoardValues() {
         return board;
     }
-
+    /*
+    Game score
+     */
     public int getScore() {
         return score;
     }
-
-    public void chooseEmptySpot() { // chooses random spot from all the empty tiles.
-        ArrayList arr = getEmptyTiles(board);
+    /*
+    chooses random spot from all the empty tiles.
+     */
+    public void chooseEmptySpot() { //
+        ArrayList arr = getEmptyTiles(board); // all the empty spots.
         if (arr.size() != 0) {
             int randomIndex = random.nextInt(arr.size()); // index from emptyTiles
             int[] emptyindex = i1Dto2D((int) arr.get(randomIndex));  // index is now X and Y
@@ -130,7 +145,9 @@ public class Game implements MyListener {
         }
 
     }
-
+    /*
+    Merges all tiles that can be merged + moves
+     */
     public GameState mergeTilesUp(GameState state, boolean move) {
         int lastValue;
         int x;
@@ -169,7 +186,9 @@ public class Game implements MyListener {
         }
         return moveUp(state, move);
     }
-
+    /*
+      Merges all tiles that can be merged + moves
+     */
     public GameState mergeTilesDown(GameState state, boolean move) {
         int lastValue = -1;
         int x;
@@ -207,7 +226,9 @@ public class Game implements MyListener {
         return moveDown(state, move);
 
     }
-
+    /*
+      Merges all tiles that can be merged + moves
+     */
     public GameState mergeTilesLeft(GameState state, boolean move) {
         int lastValue;
         int x;
@@ -245,7 +266,9 @@ public class Game implements MyListener {
         return moveLeft(state, move);
 
     }
-
+    /*
+      Merges all tiles that can be merged + moves
+    */
     public GameState mergeTilesRight(GameState state, boolean move) {
         int lastValue;
         int x;
@@ -283,7 +306,9 @@ public class Game implements MyListener {
 
         return moveRight(state, move);
     }
-
+    /*
+    Moves tiles left
+     */
     public GameState moveLeft(GameState state, boolean move) {
         for (int i = 0; i < state.getBoard().length; i++) {
             Integer[] rowCopy = new Integer[state.getBoard()[i].length];
@@ -304,6 +329,9 @@ public class Game implements MyListener {
         }
         return state;
     }
+    /*
+    Moves tiles right
+     */
 
     public GameState moveRight(GameState state, boolean move) {
         for (int i = 0; i < state.getBoard().length; i++) {
@@ -325,7 +353,9 @@ public class Game implements MyListener {
         }
         return state;
     }
-
+    /*
+    Moves tiles up
+    */
     public GameState moveUp(GameState state, boolean move) {
         for (int i = 0; i < state.getBoard().length; i++) {
             Integer[] rowCopy = new Integer[state.getBoard()[i].length];
@@ -347,7 +377,9 @@ public class Game implements MyListener {
         }
         return state;
     }
-
+    /*
+    Moves tiles down
+     */
     public GameState moveDown(GameState state, boolean move) {
         for (int i = 0; i < state.getBoard().length; i++) {
             Integer[] rowCopy = new Integer[state.getBoard()[i].length];
@@ -368,7 +400,9 @@ public class Game implements MyListener {
         }
         return state;
     }
-
+    /*
+    Checks if the current game is game over.
+     */
     public boolean isGameOver(GameState state){
         if(getEmptyTiles(state.getBoard()).size() == 0){
 
@@ -398,15 +432,22 @@ public class Game implements MyListener {
         }
         return temp;
     }
-
+    /*
+    Generating 2s 90 percent of the time and 4s 10 percent.
+     */
     public int genTwosfours() {
-        return Math.random() < 0.9 ? 2 : 4; // generating 2s 90 perecent of the time.
+        return Math.random() < 0.9 ? 2 : 4;
     }
+    /*
+    Checks if board is empty.
 
+     */
     public boolean isEmpty(int x, int y, int[][] board) {
         return board[x][y] == 0;
     }
+    /*
 
+     */
     public boolean wonGame() {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
@@ -415,10 +456,15 @@ public class Game implements MyListener {
         }
         return false;
     }
-
+    /*
+    Returns the current gamestate.
+     */
     public GameState getGameState(){
         return new GameState(board,score,false, getEmptyTiles(getBoardValues()).size());
     }
+    /*
+    Method used for movement in the desired directions.
+     */
 
     public void movement(int move) {
         GameState currentState;
@@ -455,7 +501,9 @@ public class Game implements MyListener {
             default:
         }
     }
-
+    /*
+    Used for test purpose. To check if it was made right.
+     */
     @Override
     public void keyMovement(KeyEvent e) {  // The callback is processed here. The merging can begin.
         movement(e.getKeyCode());
