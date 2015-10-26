@@ -141,9 +141,9 @@ public class MinMax {
             }*/
 
             if(currentNode.getState().getEmptyTiles() <4){
-                setDepth(8);
-            }else {
                 setDepth(6);
+            }else {
+                setDepth(5);
             }
             ret = expectimax(currentNode, currentDepth, true);
 
