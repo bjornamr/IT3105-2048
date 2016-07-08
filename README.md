@@ -12,5 +12,5 @@ For contributing to this repository please do a pull request.
 
 ### Who do I talk to? ###
 
-* Repo owner or admin
+* Repo owner:
 * -> bjornarremm@gmail.com
